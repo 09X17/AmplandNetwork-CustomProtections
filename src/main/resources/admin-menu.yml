@@ -1,0 +1,245 @@
+# ============================================
+#  ADMIN MENU CONFIGURATION
+# ============================================
+# Each item supports:
+#   material: Minecraft Material
+#   custom-model-data: Numeric value (-1 to disable)
+#   skull-value: Base64 value for custom heads (only if material is PLAYER_HEAD)
+#   display-name: Name using MiniMessage format
+#   lore: List of MiniMessage lines
+#   slot: Inventory position (0-53)
+
+title: "<red><b>⚙ ADMIN PANEL</b></red>"
+size: 54
+
+# Border decorative items
+border:
+  material: BLACK_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+  lore: []
+
+# Decorative separator
+separator:
+  material: GRAY_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+  lore: []
+
+# Statistics item (top center)
+stats:
+  slot: 4
+  material: BEACON
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<gold><b>Server Statistics</b></gold>'
+  lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Total protections: <white>%total%'
+    - ' <reset><yellow>▸ <gray>Unique players: <white>%unique_players%'
+    - ' <reset><yellow>▸ <gray>Your protections: <white>%player%'
+    - ''
+    - ' <reset><red><b>Administrator Mode</b>'
+
+# Search button (opens name search menu)
+search:
+  slot: 53
+  material: SPYGLASS
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<aqua><b>Search Player</b></aqua>'
+  lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Click to search</gray>'
+    - ' <reset><yellow>▸ <gray>protections by name</gray>'
+    - ''
+    - ' <reset><green>Click to open search'
+
+# Item representing a region in the list
+region-item:
+  material: BEACON
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<gold><b>%name%</b></gold>'
+  lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>ID: <aqua>%land_id%'
+    - ' <reset><yellow>▸ <gray>Type: <white>%type%'
+    - ' <reset><yellow>▸ <gray>World: <green>%world%'
+    - ' <reset><yellow>▸ <gray>Center: <aqua>X:%x% Y:%y% Z:%z%'
+    - ' <reset><yellow>▸ <gray>Size: <yellow>%size%'
+    - ''
+    - ' <reset><yellow>▸ <gray>Active flags: <green>%enabled_flags%'
+    - ' <reset><yellow>▸ <gray>Members: <white>%members%'
+    - ''
+    - ' <reset><red><b>Owner: <yellow>%owner%'
+    - ''
+    - ' <reset><yellow>Click to manage'
+    - ' <reset><red>Shift + Click to teleport'
+
+# Item for regions when searching a player (no redundant owner info)
+region-search-item:
+  material: PLAYER_HEAD
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<gold><b>%name%</b></gold>'
+  lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>ID: <aqua>%land_id%'
+    - ' <reset><yellow>▸ <gray>Type: <white>%type%'
+    - ' <reset><yellow>▸ <gray>World: <green>%world%'
+    - ' <reset><yellow>▸ <gray>Center: <aqua>X:%x% Y:%y% Z:%z%'
+    - ' <reset><yellow>▸ <gray>Size: <yellow>%size%'
+    - ''
+    - ' <reset><yellow>▸ <gray>Active flags: <green>%enabled_flags%'
+    - ' <reset><yellow>▸ <gray>Members: <white>%members%'
+    - ''
+    - ' <reset><yellow>Click to manage'
+    - ' <reset><red>Shift + Click to teleport'
+
+# Item when there are no results
+empty:
+  material: BARRIER
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<red><b>No Protections</b></red>'
+  lore:
+    - ''
+    - ' <reset><gray>No regions are registered.'
+    - ''
+    - ' <reset><yellow>Use /aprot give to create one'
+
+# Item when search returns nothing
+search-empty:
+  material: PLAYER_HEAD
+  custom-model-data: -1
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY3ZjAxNTMzZmUzZGQ5NTQ2ZmI5MjFhZjE0Mjg5ZjlmNjlkOGJjZjE1ZjFhNjI0MjQ1ZjAzMjA0ZjA0NjMwNyJ9fX0='
+  display-name: '<red><b>Player Not Found</b></red>'
+  lore:
+    - ''
+    - ' <reset><gray>No protections found'
+    - ' <reset><gray>for player: <white>%search%'
+    - ''
+    - ' <reset><yellow>Try another name'
+
+# Search menu header (shows current search target)
+search-header:
+  slot: 4
+  material: KNOWLEDGE_BOOK
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<aqua><b>Search Results</b></aqua>'
+  lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Searching: <white>%search%'
+    - ' <reset><yellow>▸ <gray>Found: <white>%found%'
+    - ' <reset><yellow>▸ <gray>Server total: <white>%total%'
+    - ''
+    - ' <reset><yellow>Click a region to edit'
+
+# Back button for admin main menu
+back:
+  slot: 45
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<green><b>Back</b></green>'
+  lore:
+    - ''
+    - ' <reset><gray>Click to return to panel'
+
+# Close button
+close:
+  slot: 49
+  material: BARRIER
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<red><b>Close</b></red>'
+  lore:
+    - ''
+    - ' <reset><gray>Click to exit'
+
+# Refresh button
+refresh:
+  slot: 51
+  material: COMPASS
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<aqua><b>Refresh</b></aqua>'
+  lore:
+    - ''
+    - ' <reset><gray>Click to refresh the list'
+
+# Page information
+page-info:
+  slot: 47
+  material: KNOWLEDGE_BOOK
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<white><b>Page %current% / %total%</b></white>'
+  lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Showing: <white>%showing% / %total_regions%'
+    - ''
+    - ' <reset><green>Click a region to edit'
+
+# Previous page button
+prev-page:
+  slot: 46
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<green><b>Previous</b></green>'
+  lore:
+    - ''
+    - ' <reset><gray>Click to go to page %page%'
+
+# Next page button
+next-page:
+  slot: 52
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<green><b>Next</b></green>'
+  lore:
+    - ''
+    - ' <reset><gray>Click to go to page %page%'
+
+# ============================================
+#  SEARCH MENU (Anvil GUI)
+# ============================================
+search-menu:
+  title: '<dark_gray>🔍 Search Player'
+  default-text: 'Type the name...'
+  empty-search-msg: '<red>Please enter a valid player name.'
+  player-not-found-msg: '<red>No player was found with that name.'
+
+# ============================================
+#  AVAILABLE PLACEHOLDERS
+# ============================================
+# In region-item and region-search-item:
+#   %name%         - Custom protection name
+#   %land_id%      - Protection ID (LAND1, LAND2...)
+#   %type%         - Protection type (carbon_protector, etc.)
+#   %world%        - World where the protection is located
+#   %x%, %y%, %z%  - Center coordinates
+#   %size%         - Size (e.g., 15x15, 50x50)
+#   %enabled_flags% - Number of active flags
+#   %total_flags%  - Total number of flags
+#   %members%      - Number of members
+#   %owner%        - Owner name
+#
+# In stats:
+#   %total%          - Total server protections
+#   %unique_players% - Unique players with protections
+#   %player%         - Admin's protections
+#
+# In search-header:
+#   %search%   - Search query
+#   %found%    - Number found
+#   %total%    - Server total
+#
+# In search-empty:
+#   %search%   - Searched name

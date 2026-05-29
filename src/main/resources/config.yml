@@ -1,0 +1,254 @@
+# Language setting (en, es)
+language: en
+# MySQL database configuration
+database:
+  host: 127.0.0.1
+  port: 3306
+  name: "database_name"
+  username: "username"
+  password: "password"
+  properties: ?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+# General plugin settings
+worlds:
+  disabled-worlds:
+  - world_nether
+  - world_the_end
+  max-protections-per-world: 5
+limits:
+  default: 3
+  vip: 5
+  mvp: 10
+  admin: 999
+  # LLimits by type (optional, overrides the global)
+  # If a type is not here, uses the global limit for that range
+  by-type:
+    carbon_protector:
+      default: 3
+      vip: 5
+    iron_protector:
+      default: 5
+      vip: 7
+glow:
+  enabled: true
+  color: gold
+flags:
+  enabled:
+  - pvp
+  - mob-damage
+  - mob-spawn
+  - tnt
+  - explosions
+  - entity-damage
+  - potion-splash
+  - block-break
+  - block-place
+  - leaf-decay
+  - fire-spread
+  - fire-damage
+  - fire-ignite
+  - crop-trample
+  - ice-melt
+  - snow-melt
+  - lava-flow
+  - water-flow
+  - soil-dry
+  - use-doors
+  - use-switches
+  - use-chests
+  - use-crafting
+  - use-animals
+  - use-portals
+  - use-beds
+  - use-villager
+  - frame-rotate
+  - frame-break
+  - armor-stand-edit
+  - painting-break
+  - vehicle-place
+  - vehicle-break
+  - item-drop
+  - item-pickup
+  # Flags that don't show access denied message (only cancel the action silently)
+  silent-flags:
+  - item-pickup
+  - item-drop
+  - crop-trample
+  - mob-spawn
+  - leaf-decay
+  - fire-spread
+  - fire-damage
+  - fire-ignite
+  - lava-flow
+  - water-flow
+  - ice-melt
+  - snow-melt
+  - soil-dry
+  - mob-damage
+  - entity-damage
+  - potion-splash
+  - explosions
+  - tnt
+  # Cooldown in milliseconds between access denied messages for non-silent flags
+  access-denied-cooldown-ms: 3000
+particles:
+  duration-ticks: 200
+  density: 1
+  types:
+    border: DUST
+    border-color: 0,200,255
+    border-size: 1.2
+    corner: DUST
+    corner-color: 255,165,0
+    corner-size: 1.5
+    pillar: FLAME
+    sparkle: HAPPY_VILLAGER
+    wall: END_ROD
+    fire: SOUL_FIRE_FLAME
+    witch: WITCH
+  pulse:
+    enabled: true
+    interval-ticks: 5
+    size-min: 0.7
+    size-max: 1.3
+
+economy:
+  enabled: true
+  protection-costs:
+    carbon_protector: 100.0
+    iron_protector: 500.0
+    diamond_protector: 1500.0
+    emerald_protector: 3000.0
+  bypass-permission: amplprotections.economy.bypass
+
+# ============================================
+#  BUY COMMANDS
+# ============================================
+# Commands that are executed when purchasing a protection.
+# Placeholders: %player%, %type%, %price%, %size%, %radius%
+# Use "player: <command>" to execute as the player
+# Use "console: <command>" to execute from the console
+buy-commands:
+  carbon_protector:
+    - "console: say §e%player%§r bought a Carbon Protector for $%price%"
+    - "console: money take %player% 100"
+  iron_protector:
+    - "console: say §e%player%§r bought an Iron Protector for $%price%"
+    - "console: money take %player% 500"
+  diamond_protector:
+    - "console: say §e%player%§r bought a Diamond Protector for $%price%"
+    - "console: money take %player% 1500"
+  emerald_protector:
+    - "console: say §e%player%§r bought an Emerald Protector for $%price%"
+    - "console: money take %player% 3000"
+
+teleport:
+  cooldown-seconds: 30
+  bypass-permission: amplprotections.cooldown.bypass
+
+merge:
+  enabled: true
+  cost: 50.0
+  bypass-permission: amplprotections.economy.bypass
+  max-distance: 5
+
+holograms:
+  enabled: true
+  update-interval-ticks: 20
+  content: "<white>%owner%</white> | <gray>%size%</gray> | <green>%members_online%/%members% online</green>"
+  height-offset: 2.5
+  visible-distance: 32
+  toggle-permission: amplprotections.hologram.toggle
+
+presets:
+  built-in:
+    public:
+      description: "Everyone can interact"
+      flags:
+        block-break: EVERYONE
+        block-place: EVERYONE
+        pvp: EVERYONE
+        mob-damage: EVERYONE
+        entity-damage: EVERYONE
+        tnt: EVERYONE
+        explosions: EVERYONE
+        use-doors: EVERYONE
+        use-switches: EVERYONE
+        use-chests: EVERYONE
+        use-crafting: EVERYONE
+        use-animals: EVERYONE
+        use-portals: EVERYONE
+        use-beds: EVERYONE
+        use-villager: EVERYONE
+        frame-rotate: EVERYONE
+        frame-break: EVERYONE
+        armor-stand-edit: EVERYONE
+        painting-break: EVERYONE
+        vehicle-place: EVERYONE
+        vehicle-break: EVERYONE
+        item-drop: EVERYONE
+        item-pickup: EVERYONE
+    private:
+      description: "Only the owner can interact"
+      flags:
+        block-break: OWNER
+        block-place: OWNER
+        pvp: OWNER
+        mob-damage: OWNER
+        entity-damage: OWNER
+        tnt: OWNER
+        explosions: OWNER
+        use-doors: OWNER
+        use-switches: OWNER
+        use-chests: OWNER
+        use-crafting: OWNER
+        use-animals: OWNER
+        use-portals: OWNER
+        use-beds: OWNER
+        use-villager: OWNER
+        frame-rotate: OWNER
+        frame-break: OWNER
+        armor-stand-edit: OWNER
+        painting-break: OWNER
+        vehicle-place: OWNER
+        vehicle-break: OWNER
+        item-drop: OWNER
+        item-pickup: OWNER
+    friends:
+      description: "Members and higher ranks can interact"
+      flags:
+        block-break: MEMBERS
+        block-place: MEMBERS
+        pvp: MEMBERS
+        mob-damage: MEMBERS
+        entity-damage: MEMBERS
+        tnt: MEMBERS
+        explosions: MEMBERS
+        use-doors: MEMBERS
+        use-switches: MEMBERS
+        use-chests: MEMBERS
+        use-crafting: MEMBERS
+        use-animals: MEMBERS
+        use-portals: MEMBERS
+        use-beds: MEMBERS
+        use-villager: MEMBERS
+        frame-rotate: MEMBERS
+        frame-break: MEMBERS
+        armor-stand-edit: MEMBERS
+        painting-break: MEMBERS
+        vehicle-place: MEMBERS
+        vehicle-break: MEMBERS
+        item-drop: MEMBERS
+        item-pickup: MEMBERS
+
+rental:
+  enabled: true
+  check-interval-ticks: 6000
+  default-auto-renew: false
+  max-rental-days: 30
+  tax-percent: 5.0
+
+rollback:
+  enabled: true
+  flush-interval-ticks: 600
+  max-age-days: 7

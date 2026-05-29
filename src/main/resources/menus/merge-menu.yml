@@ -1,0 +1,33 @@
+# ============================================
+#  Merge Protections Menu Configuration
+#  Menu opened with /p merge
+# ============================================
+
+title: "<gold><b>MERGE PROTECTIONS</b></gold>"
+
+border:
+  material: BLACK_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+item:
+  material: BEACON
+  custom-model-data: -1
+  skull-value: ''
+  display-name: "<gold><b>%name%</b></gold>"
+  lore:
+  - '<gray>ID: <yellow>%land_id%'
+  - '<gray>Center: <aqua>%x%, %y%, %z%'
+  - '<gray>Size: <yellow>%size%'
+  - ''
+  - '<green>Click to merge with this protection'
+
+close-button:
+  slot: 49
+  material: BARRIER
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <red><b>Close</b></red>
+  lore:
+  - <gray>Click to exit

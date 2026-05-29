@@ -1,0 +1,72 @@
+name: AmplProtections
+version: '1.0.5'
+main: com.amplan.amplprotections.AmplProtections
+api-version: '1.21'
+description: Advanced protection system with custom blocks, flags, rentals and more.
+author: 09X18
+depend: []
+softdepend:
+  - PlaceholderAPI
+  - Vault
+commands:
+  proteccion:
+    description: Main command for players.
+    aliases: [prote, protection, p]
+    permission: amplprotections.use
+  aprot:
+    description: Master command exclusive for staff.
+    aliases: [adminprotecciones, adminprot]
+    permission: amplprotections.admin.use
+
+permissions:
+  amplprotections.use:
+    description: Allows using /proteccion command
+    default: true
+  amplprotections.admin.use:
+    description: Allows using /aprot command
+    default: op
+  amplprotections.admin.bypass:
+    description: Bypass all protections
+    default: op
+  amplprotections.limit.default:
+    description: Limit of 3 protections
+    default: true
+  amplprotections.limit.vip:
+    description: Limit of 5 protections
+    default: false
+  amplprotections.limit.mvp:
+    description: Limit of 10 protections
+    default: false
+  amplprotections.limit.admin:
+    description: Limit of 999 protections
+    default: false
+  amplprotections.economy.bypass:
+    description: Place protections without cost
+    default: op
+  amplprotections.cooldown.bypass:
+    description: Bypass teleport cooldown
+    default: op
+  amplprotections.merge.use:
+    description: Allows merging protections
+    default: false
+  amplprotections.rent.use:
+    description: Allows renting protections
+    default: true
+  amplprotections.rent.create:
+    description: Allows putting protections for rent
+    default: true
+  amplprotections.rollback.use:
+    description: Allows rollback on own protections
+    default: false
+  amplprotections.rollback.admin:
+    description: Allows rollback on any protection
+    default: op
+  amplprotections.hologram.toggle:
+    description: Allows toggling holograms
+    default: true
+  amplprotections.preset.use:
+    description: Allows using flag presets
+    default: true
+  amplprotections.preset.create:
+    description: Allows creating custom presets
+    default: true

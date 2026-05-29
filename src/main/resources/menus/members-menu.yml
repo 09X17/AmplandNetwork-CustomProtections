@@ -1,0 +1,107 @@
+# ============================================
+#  Members Menu Configuration
+#  Menu for managing protection members
+# ============================================
+
+title: <dark_gray>Manage Members
+
+border:
+  material: BLACK_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+separator:
+  material: GRAY_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+header:
+  material: KNOWLEDGE_BOOK
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <gold><b>Information</b></gold>
+  lore:
+  - '<gray>Protection: <white>%name%'
+  - '<gray>Owner: <gold>%owner%'
+  - '<gray>Current members: <white>%count%'
+  - ''
+  - '<green>Left click: Kick'
+  - '<yellow>Right click: Promote/Demote'
+
+member-item:
+  material: PLAYER_HEAD
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '%color%<b>%name%</b>'
+  lore:
+  - '<gray>Rank: %color%%rank%'
+  - '<gray>Joined: %joined%'
+  - ''
+  - '<yellow>Left click: Kick from protection'
+  - '%action%'
+
+empty-item:
+  material: PLAYER_HEAD
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <gray><b>No Members</b></gray>
+  lore:
+  - <gray>No members registered.
+  - ''
+  - <yellow>Use /p add <player>
+  - <yellow>to add members
+
+back-button:
+  slot: 49
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <aqua><b>Back</b></aqua>
+  lore:
+  - <gray>Click to return to main menu
+
+refresh-button:
+  slot: 47
+  material: COMPASS
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <white><b>Refresh</b></white>
+  lore:
+  - <gray>Click to refresh the list
+
+kick-all-button:
+  slot: 51
+  material: TNT
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <red><b>Kick All</b></red>
+  lore:
+  - <red>This will kick all members!
+  - ''
+  - <dark_gray>Shift + Click to execute
+
+ranks:
+  owner:
+    display: Owner
+    color: <gold>
+  secondary-owner:
+    display: Secondary Owner
+    color: <light_purple>
+  admin:
+    display: Admin
+    color: <red>
+  member:
+    display: Member
+    color: <green>
+
+actions:
+  promote-to-admin: '<green>Right click: Promote to Admin'
+  promote-to-secondary: '<light_purple>Right click: Promote to Secondary Owner'
+  demote-to-admin: '<yellow>Right click: Demote to Admin'
+  demote-to-member: '<yellow>Right click: Demote to Member'
+  kick-owner: '<red>Left click: Kick Owner'
+  kick-secondary-owner: '<red>Left click: Kick Secondary Owner'
+  kick-admin: '<red>Left click: Kick Admin'
+  kick-member: '<red>Left click: Kick Member'

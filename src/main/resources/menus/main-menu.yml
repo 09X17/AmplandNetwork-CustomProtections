@@ -1,0 +1,487 @@
+# ============================================
+#  Main Protection Menu Configuration
+#  Menu opened with /p menu
+# ============================================
+
+title: "<#3B90FF><b>PROTECTION SETTINGS</b></#3B90FF>"
+
+# Slots where flags are displayed (max per page = number of slots)
+# Default layout: 3 rows of 7 slots
+flag-slots:
+- 19
+- 20
+- 21
+- 22
+- 23
+- 24
+- 25
+- 28
+- 29
+- 30
+- 31
+- 32
+- 33
+- 34
+- 37
+- 38
+- 39
+- 40
+- 41
+- 42
+- 43
+
+# You can disable decorative borders or customize them with any item (material, custom model data, or skull value)
+border:
+  enabled: true
+  material: BLACK_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+separator:
+  enabled: true
+  material: GRAY_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+info-item:
+  enabled: true
+  slot: 13
+  material: PAPER
+  custom-model-data: 1059
+  skull-value: ''
+  display-name: "<#FF7AAD><b>✻ INFORMATION</b></#FF7AAD>"
+  lore:
+  - ""
+  - ' <red>▸</red> <gray>ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ɪᴅ: <aqua>%land%'
+  - ' <red>▸</red> <gray>ᴛʏᴘᴇ: <aqua>%type%'
+  - ' <red>▸</red> <gray>sɪᴢᴇ: <aqua>%size%'
+  - ' <red>▸</red> <gray>ᴄᴇɴᴛᴇʀ: <aqua>X:%x% Y:%y% Z:%z%'
+  - ""
+
+status-item:
+  enabled: true
+  slot-left: 10
+  slot-right: 16
+  enabled-material: LIME_DYE
+  disabled-material: RED_DYE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <white><b>Status</b></white>
+  lore:
+  - '<green>Allowed: <white>%enabled%'
+  - '<red>Denied: <white>%disabled%'
+
+members-button:
+  enabled: true
+  slot: 47
+  material: PLAYER_HEAD
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <yellow><b>Members</b></yellow>
+  lore:
+  - '<gray>Current: <white>%count%'
+  - ''
+  - <green>Click to manage
+
+close-button:
+  enabled: true
+  slot: 49
+  material: BARRIER
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <red><b>Close</b></red>
+  lore:
+  - <gray>Click to exit
+
+delete-button:
+  enabled: true
+  slot: 51
+  material: TNT
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <red><b>Delete</b></red>
+  lore:
+  - <red>Irreversible action!
+  - ''
+  - <dark_gray>Shift + Click to delete
+
+view-button:
+  enabled: true
+  slot: 45
+  material: COMPASS
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <aqua><b>View Borders</b></aqua>
+  lore:
+  - <gray>Click for particle preview
+
+prev-page-button:
+  enabled: true
+  slot: 46
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <green><b>Previous</b></green>
+  lore:
+  - <gray>Click for previous page
+
+next-page-button:
+  enabled: true
+  slot: 52
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <green><b>Next</b></green>
+  lore:
+  - <gray>Click for next page
+
+page-info:
+  enabled: true
+  material: KNOWLEDGE_BOOK
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <white>Page %current% / %total%</white>
+  lore:
+  - '<gray>Flags: <white>%showing%'
+
+hologram-button:
+  enabled: true
+  slot: 48
+  material: END_CRYSTAL
+  custom-model-data: -1
+  skull-value: ''
+  display-name-on: "<green><b>Hologram: ON</b></green>"
+  display-name-off: "<red><b>Hologram: OFF</b></red>"
+  lore-on:
+  - <gray>Click to disable
+  lore-off:
+  - <gray>Click to enable
+
+merge-button:
+  enabled: true
+  slot: 50
+  material: ANVIL
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <gold><b>Merge</b></gold>
+  lore:
+  - <gray>Click to merge with another protection
+
+preset-button:
+  enabled: true
+  slot: 44
+  material: BOOK
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <aqua><b>Presets</b></aqua>
+  lore:
+  - <gray>Click to apply a flag preset
+
+# You can define custom items for each flag state (none, owner, members, admins, everyone) using material, custom model data, or skull value
+# Use: custom-model-data for custom textures, skull for player heads, or material for standard items. Display name and lore can also be customized with placeholders.
+flag-item:
+  type: custom-model-data
+  material:
+    none: PAPER
+    owner: PAPER
+    members: PAPER
+    admins: PAPER
+    everyone: PAPER
+
+  custom-model-data:
+    none: 90003
+    owner: 90003
+    members: 90003
+    admins: 90003
+    everyone: 90001
+
+  skull-value:
+    none: ""
+    owner: ""
+    members: ""
+    admins: ""
+    everyone: ""
+
+# Custom flags
+flags:
+  pvp:
+    display-name: <u><b><#B0FFC4>PLAYER VS PLAYER</#B0FFC4>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% combat</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  mob-damage:
+    display-name: <u><b><#B0FFC4>MOB DAMAGE</#B0FFC4>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% mob damage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  mob-spawn:
+    display-name: <u><b><#B0FFC4>MOB SPAWNING</#B0FFC4>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% mob spawning</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  tnt:
+    display-name: <u><b><#B0FFC4>TNT USAGE</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% TNT</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  explosions:
+    display-name: <u><b><#B0FFC4>EXPLOSIONS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% explosions</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  entity-damage:
+    display-name: <u><b><#B0FFC4>ENTITY DAMAGE</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% entity damage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  potion-splash:
+    display-name: <u><b><#B0FFC4>POTIONS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% potions</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  block-break:
+    display-name: <u><b><#B0FFC4>BLOCK BREAKING</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% block breaking</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  block-place:
+    display-name: <u><b><#B0FFC4>BLOCK PLACING</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% block placement</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  leaf-decay:
+    display-name: <u><b><#B0FFC4>LEAF DECAY</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% leaf decay</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  fire-spread:
+    display-name: <u><b><#B0FFC4>FIRE SPREAD</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% fire spread</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  fire-damage:
+    display-name: <u><b><#B0FFC4>FIRE DAMAGE</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% fire damage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  fire-ignite:
+    display-name: <u><b><#B0FFC4>FIRE IGNITION</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% fire ignition</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  crop-trample:
+    display-name: <u><b><#B0FFC4>CROP TRAMPLE</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% crop damage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  ice-melt:
+    display-name: <u><b><#B0FFC4>ICE MELTING</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% ice melting</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  lava-flow:
+    display-name: <u><b><#B0FFC4>LAVA FLOW</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% lava flow</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  snow-melt:
+    display-name: <u><b><#B0FFC4>SNOW MELTING</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% snow melting</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  water-flow:
+    display-name: <u><b><#B0FFC4>WATER FLOW</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% water flow</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  soil-dry:
+    display-name: <u><b><#B0FFC4>SOIL DRYING</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% soil drying</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  use-doors:
+    display-name: <u><b><#B0FFC4>USE DOORS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% door usage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  use-switches:
+    display-name: <u><b><#B0FFC4>USE LEVERS/BUTTONS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% switch usage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  use-chests:
+    display-name: <u><b><#B0FFC4>USE CHESTS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% chest usage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  use-crafting:
+    display-name: <u><b><#B0FFC4>USE CRAFTING</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% crafting usage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  use-animals:
+    display-name: <u><b><#B0FFC4>USE ANIMALS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% animal interaction</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  use-portals:
+    display-name: <u><b><#B0FFC4>USE PORTALS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% portal usage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  use-beds:
+    display-name: <u><b><#B0FFC4>USE BEDS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% bed usage</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  use-villager:
+    display-name: <u><b><#B0FFC4>USE VILLAGERS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% villager interaction</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  frame-rotate:
+    display-name: <u><b><#B0FFC4>ROTATE FRAMES</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% frame rotation</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  frame-break:
+    display-name: <u><b><#B0FFC4>BREAK FRAMES</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% frame breaking</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  armor-stand-edit:
+    display-name: <u><b><#B0FFC4>EDIT ARMOR STANDS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% armor stand editing</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  painting-break:
+    display-name: <u><b><#B0FFC4>BREAK PAINTINGS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% painting breaking</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  vehicle-place:
+    display-name: <u><b><#B0FFC4>PLACE VEHICLES</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% vehicle placement</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  vehicle-break:
+    display-name: <u><b><#B0FFC4>BREAK VEHICLES</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% vehicle breaking</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  item-drop:
+    display-name: <u><b><#B0FFC4>DROP ITEMS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% item dropping</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  item-pickup:
+    display-name: <u><b><#B0FFC4>PICK UP ITEMS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% item pickup</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'

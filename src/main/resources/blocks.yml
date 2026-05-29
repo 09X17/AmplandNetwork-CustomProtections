@@ -1,0 +1,80 @@
+# Server protection block registry
+# Each block supports:
+#   material: Minecraft Material (PLAYER_HEAD for heads)
+#   custom-model-data: Value for textures using a resource pack (-1 to disable)
+#   skull-value: Base64 texture value for custom heads (only if material is PLAYER_HEAD)
+#   display-name: Block name using MiniMessage format
+#   radius: Protection radius (area = radius * 2 + 1)
+#   hide-block: true to hide the block after placement (invisible but still functional)
+#   glow-on-view: true for the block to emit particle glow when using /p view
+#   enable-merge: true/false if this protection type can be merged with others of the same type
+#   max-merge-radius: Maximum radius the merged result can reach (0 = not applicable)
+
+protection-blocks:
+  carbon_protector:
+    material: "PLAYER_HEAD"
+    custom-model-data: -1
+    skull-value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzYxODczMWUwNjMzNzlhZWJmODJmMWQ2NGM0MTljOTBkN2YwYzE2NDhjNTQ4ZTliNjE1MWIxYmFiYTY2ZDcyMyJ9fX0="
+    display-name: "<gray>Protection Block <dark_gray>[15x15]"
+    radius: 15
+    hide-block: false
+    glow-on-view: true
+    enable-merge: false
+    max-merge-radius: 30
+
+  iron_protector:
+    material: "PLAYER_HEAD"
+    custom-model-data: -1
+    skull-value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTYzYjg3ZWU2YTU1ZjJiZjAxMzViMjZiZDk2ZWMyNzllZGVkMTc1Zjk0OGMwMzZkODhhNjA3MjVlMTI3MzcxYyJ9fX0="
+    display-name: "<white>Protection Block <gray>[50x50]"
+    radius: 50
+    hide-block: false
+    glow-on-view: true
+    enable-merge: false
+    max-merge-radius: 95
+
+  diamond_protector:
+    material: "PLAYER_HEAD"
+    custom-model-data: 1003
+    skull-value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I1ZmFmNGNkODcxMzhjODcxY2M2YTg2NzU4MTdhODk5ODVhM2NiODk3MjFhNGM3NjJmZTY2NmZmNjE4MWMyNCJ9fX0="
+    display-name: "<aqua>Protection Block <dark_aqua>[100x100]"
+    radius: 100
+    hide-block: false
+    glow-on-view: true
+    enable-merge: false
+    max-merge-radius: 0
+
+  emerald_protector:
+    material: "PLAYER_HEAD"
+    custom-model-data: -1
+    skull-value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTgwMTI3ZDBhYTU3OTNhODI2Yzg4ZmY4YmZhNWQzZTk5N2IzZTQ5Yzc0NzExMDYyNTljNGRjMzcyMTMwZmEzNyJ9fX0="
+    display-name: "<green>Protection Block <dark_green>[200x200]"
+    radius: 200
+    hide-block: false
+    glow-on-view: true
+    enable-merge: false
+    max-merge-radius: 0
+
+# Example of protection using a custom head:
+# skull_protector:
+#   material: "PLAYER_HEAD"
+#   custom-model-data: -1
+#   skull-value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGQ1ZTg3MjFmYjQxNjM5ZjZmMjI3ZjQzYjg0ZjE4YjZjMjYzNjY3ZjQ2NjI2MjYyNjI2MjYyNjI2MjYyNiJ9fX0="
+#   display-name: "<gold>Protection Head <yellow>[10x10]"
+#   radius: 10
+#   hide-block: false
+#   glow-on-view: true
+#   enable-merge: true
+#   max-merge-radius: 25
+
+# Example of hidden protection (invisible block):
+# hidden_protector:
+#   material: "BARRIER"
+#   custom-model-data: -1
+#   skull-value: ""
+#   display-name: "<dark_gray>Hidden Protection"
+#   radius: 15
+#   hide-block: true
+#   glow-on-view: true
+#   enable-merge: false
+#   max-merge-radius: 0

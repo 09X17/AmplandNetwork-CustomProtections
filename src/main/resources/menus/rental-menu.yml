@@ -1,0 +1,21 @@
+# ============================================
+#  Rental Menu Configuration
+#  Menu opened with /p rent
+# ============================================
+
+title: "<gold><b>PROTECTION RENTAL</b></gold>"
+
+border:
+  material: BLACK_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+close-button:
+  slot: 49
+  material: BARRIER
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <red><b>Close</b></red>
+  lore:
+  - <gray>Click to exit

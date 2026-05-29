@@ -1,0 +1,74 @@
+# ============================================
+#  Global Protections Menu Configuration
+#  Used by /aprot list (admin mode)
+# ============================================
+
+title-admin: '<red>Admin Panel: All Regions'
+title-player: <dark_gray>My Active Protections
+
+border:
+  material: BLACK_STAINED_GLASS_PANE
+  custom-model-data: -1
+  display-name: '<dark_gray> '
+
+stats-item:
+  material: BEACON
+  custom-model-data: -1
+  display-name: <gold><b>Statistics</b></gold>
+  lore:
+  - '<gray>Server total: <white>%total%'
+  - '<gray>Your protections: <white>%player%'
+  - ''
+  - '%mode%'
+
+empty-item:
+  material: BARRIER
+  custom-model-data: -1
+  display-name: <red><b>No Protections</b></red>
+  lore:
+  - <gray>No regions are registered.
+  - ''
+  - <yellow>Place a protection block
+  - <yellow>to create a region
+
+close-button:
+  slot: 49
+  material: BARRIER
+  custom-model-data: -1
+  display-name: <red><b>Close</b></red>
+  lore:
+  - <gray>Click to exit
+
+refresh-button:
+  slot: 51
+  material: COMPASS
+  custom-model-data: -1
+  display-name: <aqua><b>Refresh</b></aqua>
+  lore:
+  - <gray>Click to refresh the list
+
+page-info:
+  slot: 47
+  material: KNOWLEDGE_BOOK
+  custom-model-data: -1
+  display-name: <white><b>Page %current% / %total%</b></white>
+  lore:
+  - '<gray>Showing: <white>%showing% / %totalRegions% regions'
+  - ''
+  - <green>Click a region to edit
+
+prev-button:
+  slot: 45
+  material: ARROW
+  custom-model-data: -1
+  display-name: <green><b>Previous</b></green>
+  lore:
+  - <gray>Click for page %page%
+
+next-button:
+  slot: 53
+  material: ARROW
+  custom-model-data: -1
+  display-name: <green><b>Next</b></green>
+  lore:
+  - <gray>Click for page %page%

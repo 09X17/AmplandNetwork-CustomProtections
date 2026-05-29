@@ -1,0 +1,100 @@
+# ============================================
+#  Player Protection List Menu Configuration
+#  Menu opened with /p list
+# ============================================
+
+title: <dark_gray><b>My Protections</b></dark_gray>
+
+border:
+  material: BLACK_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+separator:
+  material: GRAY_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+stats-item:
+  material: BEACON
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <gold><b>Statistics</b></gold>
+  lore:
+  - '<gray>Your protections: <white>%player%'
+  - ''
+  - '<green>Click to teleport'
+  - '<yellow>Shift + Click to manage'
+
+empty-item:
+  material: BARRIER
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <red><b>No Protections</b></red>
+  lore:
+  - <gray>You have no registered protections.
+  - ''
+  - <yellow>Place a protection block
+  - <yellow>to create a region
+
+region-item:
+  custom-model-data: -1
+  display-name: <gold><b>%name%</b></gold>
+  lore:
+  - '<gray>ID: <yellow>%land_id%'
+  - '<gray>World: <green>%world%'
+  - '<gray>Center: <aqua>%x%, %y%, %z%'
+  - '<gray>Size: <yellow>%size%'
+  - ''
+  - '<dark_gray>Flags: <green>%enabled_flags%<dark_gray>/<gray>%total_flags%'
+  - '<gray>Members: <white>%members%'
+  - ''
+  - '<green>Left Click: Teleport'
+  - '<yellow>Shift + Click: Manage'
+
+close-button:
+  slot: 49
+  material: BARRIER
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <red><b>Close</b></red>
+  lore:
+  - <gray>Click to exit
+
+refresh-button:
+  slot: 51
+  material: COMPASS
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <aqua><b>Refresh</b></aqua>
+  lore:
+  - <gray>Click to refresh the list
+
+page-info:
+  slot: 47
+  material: KNOWLEDGE_BOOK
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <white><b>Page %current% / %total%</b></white>
+  lore:
+  - '<gray>Showing: <white>%showing% / %total_regions% regions'
+
+prev-button:
+  slot: 45
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <green><b>Previous</b></green>
+  lore:
+  - <gray>Click for page %page%
+
+next-button:
+  slot: 53
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <green><b>Next</b></green>
+  lore:
+  - <gray>Click for page %page%

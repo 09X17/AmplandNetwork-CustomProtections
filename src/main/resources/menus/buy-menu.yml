@@ -1,0 +1,42 @@
+# ============================================
+#  Buy Protection Menu Configuration
+#  Menu opened with /p buy
+# ============================================
+
+title: "<gold><b>PROTECTION SHOP</b></gold>"
+
+border:
+  material: BLACK_STAINED_GLASS_PANE
+  custom-model-data: -1
+  skull-value: ''
+  display-name: '<dark_gray> '
+
+item:
+  custom-model-data: -1
+  skull-value: ''
+  display-name: "<gold><b>%name%</b></gold>"
+  lore:
+  - '<gray>Size: <yellow>%size%x%size%'
+  - '<gray>Radius: <aqua>%radius% blocks'
+  - ''
+  - '<green>Price: <yellow>$%price%'
+  - ''
+  - '<gray>Click to purchase'
+
+back-button:
+  slot: 49
+  material: ARROW
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <aqua><b>Back</b></aqua>
+  lore:
+  - <gray>Click to return
+
+close-button:
+  slot: 53
+  material: RED_WOOL
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <red><b>Close</b></red>
+  lore:
+  - <gray>Click to exit
