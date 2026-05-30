@@ -2,7 +2,6 @@
 
 Sistema avanzado de protecciones para servidores Minecraft con bloques personalizados, flags de permisos, alquileres, rollback y mas.
 
-**Version:** 1.0.5 | **API:** 1.21 | **Autor:** 09X18
 
 ---
 
