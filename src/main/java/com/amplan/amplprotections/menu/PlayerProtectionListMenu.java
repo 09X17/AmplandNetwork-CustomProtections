@@ -90,6 +90,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
         this(plugin, targetPlayer, 1);
     }
 
+    @SuppressWarnings("ThisEscapedInObjectConstruction")
     public PlayerProtectionListMenu(AmplProtections plugin, Player targetPlayer, int page) {
         this.plugin = plugin;
         this.manager = plugin.getProtectionManager();
@@ -237,7 +238,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
 
         ItemStack statsItem = new ItemBuilder(statsMaterial)
                 .setDisplayName(statsDisplayName)
-                .setLore(processedLore.toArray(new String[0]))
+                .setLore(processedLore.toArray(String[]::new))
                 .build();
         if (statsCustomModelData != -1) {
             ItemMeta meta = statsItem.getItemMeta();
@@ -260,7 +261,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
     private void buildEmptyState() {
         ItemStack emptyItem = new ItemBuilder(emptyMaterial)
                 .setDisplayName(emptyDisplayName)
-                .setLore(emptyLore.toArray(new String[0]))
+                .setLore(emptyLore.toArray(String[]::new))
                 .build();
         if (emptyCustomModelData != -1) {
             ItemMeta meta = emptyItem.getItemMeta();
@@ -372,7 +373,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
                 .setDisplayName(pageInfoDisplayName
                         .replace("%current%", String.valueOf(page))
                         .replace("%total%", String.valueOf(totalPages)))
-                .setLore(processedPageLore.toArray(new String[0]))
+                .setLore(processedPageLore.toArray(String[]::new))
                 .build();
         if (pageInfoCustomModelData != -1) {
             ItemMeta meta = pageInfo.getItemMeta();
@@ -385,7 +386,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
 
         ItemStack closeBtn = new ItemBuilder(closeMaterial)
                 .setDisplayName(closeDisplayName)
-                .setLore(closeLore.toArray(new String[0]))
+                .setLore(closeLore.toArray(String[]::new))
                 .build();
         if (closeCustomModelData != -1) {
             ItemMeta meta = closeBtn.getItemMeta();
@@ -398,7 +399,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
 
         ItemStack refreshBtn = new ItemBuilder(refreshMaterial)
                 .setDisplayName(refreshDisplayName)
-                .setLore(refreshLore.toArray(new String[0]))
+                .setLore(refreshLore.toArray(String[]::new))
                 .build();
         if (refreshCustomModelData != -1) {
             ItemMeta meta = refreshBtn.getItemMeta();
@@ -416,7 +417,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
             }
             ItemStack prevBtn = new ItemBuilder(prevMaterial)
                     .setDisplayName(prevDisplayName.replace("%page%", String.valueOf(page - 1)))
-                    .setLore(processedPrevLore.toArray(new String[0]))
+                    .setLore(processedPrevLore.toArray(String[]::new))
                     .build();
             if (prevCustomModelData != -1) {
                 ItemMeta meta = prevBtn.getItemMeta();
@@ -435,7 +436,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
             }
             ItemStack nextBtn = new ItemBuilder(nextMaterial)
                     .setDisplayName(nextDisplayName.replace("%page%", String.valueOf(page + 1)))
-                    .setLore(processedNextLore.toArray(new String[0]))
+                    .setLore(processedNextLore.toArray(String[]::new))
                     .build();
             if (nextCustomModelData != -1) {
                 ItemMeta meta = nextBtn.getItemMeta();
@@ -456,19 +457,25 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
     @Override
     public void handleMenuClick(int slot, Player player, org.bukkit.event.inventory.ClickType clickType) {
         if (slot == closeSlot) {
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            Location loc = player.getLocation();
+            if (loc == null) return;
+            player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
             player.closeInventory();
             return;
         }
 
         if (slot == refreshSlot) {
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            Location loc = player.getLocation();
+            if (loc == null) return;
+            player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
             plugin.getMenuManager().openMenu(player, new PlayerProtectionListMenu(plugin, player, page));
             return;
         }
 
         if (slot == prevSlot && page > 1) {
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            Location loc = player.getLocation();
+            if (loc == null) return;
+            player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
             plugin.getMenuManager().openMenu(player, new PlayerProtectionListMenu(plugin, player, page - 1));
             return;
         }
@@ -477,7 +484,9 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
             List<ProtectionRegion> regions = manager.getRegionsByOwner(player.getUniqueId());
             int totalPages = (int) Math.ceil((double) regions.size() / ITEMS_PER_PAGE);
             if (page < totalPages) {
-                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+                Location loc = player.getLocation();
+                if (loc == null) return;
+                player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
                 plugin.getMenuManager().openMenu(player, new PlayerProtectionListMenu(plugin, player, page + 1));
             }
             return;
@@ -487,7 +496,9 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
             ProtectionRegion selectedRegion = slotToRegionMap.get(slot);
 
             if (clickType == org.bukkit.event.inventory.ClickType.SHIFT_LEFT || clickType == org.bukkit.event.inventory.ClickType.SHIFT_RIGHT) {
-                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.0f);
+                Location loc = player.getLocation();
+                if (loc == null) return;
+                player.playSound(loc, Sound.UI_BUTTON_CLICK, 0.6f, 1.0f);
                 plugin.getMenuManager().openMenu(player, new MainProtectionMenu(plugin, selectedRegion));
                 return;
             }
@@ -495,7 +506,9 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
             World world = Bukkit.getWorld(selectedRegion.getWorldName());
             if (world == null) {
                 player.sendMessage(mm.deserialize("<red>✘ El mundo de esta protección no existe."));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
+                Location loc = player.getLocation();
+                if (loc == null) return;
+                player.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                 return;
             }
 
@@ -505,7 +518,9 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
 
             if (targetY == -1) {
                 player.sendMessage(mm.deserialize("<red>✘ No se encontro una posicion segura para teletransportarse."));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
+                Location loc = player.getLocation();
+                if (loc == null) return;
+                player.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                 return;
             }
 
@@ -513,14 +528,18 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
                 long remaining = plugin.getTeleportCooldownManager().getRemainingSeconds(player);
                 String msg = MessageUtils.lang("teleport.cooldown").replace("%seconds%", String.valueOf(remaining));
                 player.sendMessage(mm.deserialize(msg));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
+                Location loc = player.getLocation();
+                if (loc == null) return;
+                player.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                 return;
             }
 
             Location tpLocation = new Location(world, targetX + 0.5, targetY, targetZ + 0.5);
             player.teleport(tpLocation);
             plugin.getTeleportCooldownManager().setCooldown(player);
-            player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+            Location loc = player.getLocation();
+            if (loc == null) return;
+            player.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
             String tpMsg = MessageUtils.lang("teleport.teleported").replace("%region%", selectedRegion.getCustomName());
             player.sendMessage(mm.deserialize(tpMsg));
             player.closeInventory();

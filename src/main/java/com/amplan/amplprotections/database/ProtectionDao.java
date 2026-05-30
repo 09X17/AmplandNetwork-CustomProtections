@@ -422,11 +422,10 @@ public class ProtectionDao {
 
     public CompletableFuture<Void> saveRentalAsync(com.amplan.amplprotections.model.Rental rental) {
         return CompletableFuture.runAsync(() -> {
-            String sql = "INSERT INTO ap_rentals (region_id, renter_uuid, start_time, end_time, price, auto_renew, last_payment) "
-                    +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?) " +
+            String sql = "INSERT INTO ap_rentals (region_id, renter_uuid, start_time, end_time, price, auto_renew, last_payment, duration_days) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
                     "ON DUPLICATE KEY UPDATE renter_uuid = VALUES(renter_uuid), start_time = VALUES(start_time), " +
-                    "end_time = VALUES(end_time), price = VALUES(price), auto_renew = VALUES(auto_renew), last_payment = VALUES(last_payment)";
+                    "end_time = VALUES(end_time), price = VALUES(price), auto_renew = VALUES(auto_renew), last_payment = VALUES(last_payment), duration_days = VALUES(duration_days)";
             try (Connection conn = mySQL.getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, rental.getRegionId());
@@ -436,6 +435,7 @@ public class ProtectionDao {
                 ps.setDouble(5, rental.getPrice());
                 ps.setBoolean(6, rental.isAutoRenew());
                 ps.setLong(7, rental.getLastPayment());
+                ps.setInt(8, rental.getDurationDays());
                 ps.executeUpdate();
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error guardando rental", e);
@@ -472,7 +472,8 @@ public class ProtectionDao {
                             rs.getLong("end_time"),
                             rs.getDouble("price"),
                             rs.getBoolean("auto_renew"),
-                            rs.getLong("last_payment")));
+                            rs.getLong("last_payment"),
+                            rs.getInt("duration_days")));
                 }
                 future.complete(rentals);
             } catch (SQLException e) {

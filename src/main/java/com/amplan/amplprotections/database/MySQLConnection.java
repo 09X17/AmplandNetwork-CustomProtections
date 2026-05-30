@@ -1,17 +1,18 @@
 package com.amplan.amplprotections.database;
 
-import com.amplan.amplprotections.AmplProtections;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import org.bukkit.configuration.file.FileConfiguration;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.amplan.amplprotections.AmplProtections;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class MySQLConnection {
 
@@ -25,17 +26,18 @@ public class MySQLConnection {
 
     public boolean connect() {
         FileConfiguration config = plugin.getConfig();
-        
+
         String host = config.getString("database.host", "localhost");
         int port = config.getInt("database.port", 3306);
         String database = config.getString("database.name", "minecraft_server");
         String username = config.getString("database.username", "root");
         String password = config.getString("database.password", "password123");
-        String properties = config.getString("database.properties", "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+        String properties = config.getString("database.properties",
+                "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
 
         try {
             HikariConfig hikariConfig = new HikariConfig();
-            
+
             hikariConfig.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database + properties);
             hikariConfig.setUsername(username);
             hikariConfig.setPassword(password);
@@ -45,7 +47,7 @@ public class MySQLConnection {
             hikariConfig.setMaxLifetime(1800000);
             hikariConfig.setKeepaliveTime(0);
             hikariConfig.setConnectionTimeout(5000);
-            
+
             hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
             hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
             hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -54,24 +56,20 @@ public class MySQLConnection {
             this.dataSource = new HikariDataSource(hikariConfig);
 
             AtomicInteger threadNum = new AtomicInteger(0);
-            this.dbExecutor = Executors.newFixedThreadPool(4, new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    Thread t = new Thread(r, "AmplProtections-DB-" + threadNum.getAndIncrement());
-                    t.setDaemon(true);
-                    return t;
-                }
+            this.dbExecutor = Executors.newFixedThreadPool(4, r -> {
+                Thread t = new Thread(r, "AmplProtections-DB-" + threadNum.getAndIncrement());
+                t.setDaemon(true);
+                return t;
             });
-            
+
             try (Connection conn = dataSource.getConnection()) {
                 plugin.getLogger().info("¡Conexión exitosa con el pool de MySQL de HikariCP!");
                 createTables(conn);
                 return true;
             }
 
-        } catch (Exception e) {
-            plugin.getLogger().severe("Error al conectar a la base de datos: " + e.getMessage());
-            e.printStackTrace();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error al conectar a la base de datos", e);
             return false;
         }
     }
@@ -162,7 +160,8 @@ public class MySQLConnection {
         try (Statement stmt = connection.createStatement()) {
             try (var rs = stmt.executeQuery("SHOW COLUMNS FROM ap_protections LIKE 'custom_lore'")) {
                 if (!rs.next()) {
-                    stmt.execute("ALTER TABLE ap_protections ADD COLUMN custom_lore TEXT DEFAULT NULL AFTER custom_name");
+                    stmt.execute(
+                            "ALTER TABLE ap_protections ADD COLUMN custom_lore TEXT DEFAULT NULL AFTER custom_name");
                     plugin.getLogger().info("Migracion: columna custom_lore agregada a ap_protections");
                 }
             }
@@ -170,7 +169,8 @@ public class MySQLConnection {
             try (var rs = stmt.executeQuery("SHOW COLUMNS FROM ap_protection_flags LIKE 'flag_key'")) {
                 if (!rs.next()) {
                     stmt.execute("ALTER TABLE ap_protection_flags ADD COLUMN flag_key VARCHAR(64) NOT NULL DEFAULT ''");
-                    stmt.execute("ALTER TABLE ap_protection_flags DROP PRIMARY KEY, ADD PRIMARY KEY (protection_id, flag_key)");
+                    stmt.execute(
+                            "ALTER TABLE ap_protection_flags DROP PRIMARY KEY, ADD PRIMARY KEY (protection_id, flag_key)");
                     plugin.getLogger().info("Migracion: estructura de ap_protection_flags actualizada");
                 }
             }
@@ -186,7 +186,8 @@ public class MySQLConnection {
 
             try (var rs = stmt.executeQuery("SHOW COLUMNS FROM ap_protection_members LIKE 'joined_at'")) {
                 if (!rs.next()) {
-                    stmt.execute("ALTER TABLE ap_protection_members ADD COLUMN joined_at BIGINT DEFAULT 0 AFTER rank_level");
+                    stmt.execute(
+                            "ALTER TABLE ap_protection_members ADD COLUMN joined_at BIGINT DEFAULT 0 AFTER rank_level");
                     plugin.getLogger().info("Migracion: columna joined_at agregada a ap_protection_members");
                 }
             }
@@ -203,7 +204,8 @@ public class MySQLConnection {
                     String columnType = rs.getString("Type");
                     if (columnType != null && columnType.toLowerCase().contains("tinyint(1)")) {
                         stmt.execute("ALTER TABLE ap_protection_flags MODIFY COLUMN flag_value TINYINT DEFAULT 0");
-                        plugin.getLogger().info("Migracion: columna flag_value convertida de BOOLEAN a TINYINT para soportar niveles de permiso");
+                        plugin.getLogger().info(
+                                "Migracion: columna flag_value convertida de BOOLEAN a TINYINT para soportar niveles de permiso");
                     }
                 }
             }
@@ -216,6 +218,7 @@ public class MySQLConnection {
                     "price DECIMAL(10,2) DEFAULT 0.00," +
                     "auto_renew BOOLEAN DEFAULT FALSE," +
                     "last_payment BIGINT DEFAULT 0," +
+                    "duration_days INT NOT NULL DEFAULT 0," +
                     "PRIMARY KEY (region_id, renter_uuid)," +
                     "FOREIGN KEY (region_id) REFERENCES ap_protections(id) ON DELETE CASCADE," +
                     "INDEX (end_time)" +
@@ -248,6 +251,14 @@ public class MySQLConnection {
                     "INDEX (owner_uuid)," +
                     "UNIQUE INDEX (name, owner_uuid)" +
                     ");");
+
+            try (var rs = stmt.executeQuery("SHOW COLUMNS FROM ap_rentals LIKE 'duration_days'")) {
+                if (!rs.next()) {
+                    stmt.execute(
+                            "ALTER TABLE ap_rentals ADD COLUMN duration_days INT NOT NULL DEFAULT 0 AFTER last_payment");
+                    plugin.getLogger().info("Migracion: columna duration_days agregada a ap_rentals");
+                }
+            }
         }
     }
 }

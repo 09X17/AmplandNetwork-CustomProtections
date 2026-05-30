@@ -11,8 +11,9 @@ public class Rental {
     private double price;
     private boolean autoRenew;
     private long lastPayment;
+    private int durationDays;
 
-    public Rental(int regionId, UUID renterUuid, long startTime, long endTime, double price, boolean autoRenew) {
+    public Rental(int regionId, UUID renterUuid, long startTime, long endTime, double price, boolean autoRenew, int durationDays) {
         this.regionId = regionId;
         this.renterUuid = renterUuid;
         this.startTime = startTime;
@@ -20,9 +21,10 @@ public class Rental {
         this.price = price;
         this.autoRenew = autoRenew;
         this.lastPayment = startTime;
+        this.durationDays = durationDays;
     }
 
-    public Rental(int regionId, UUID renterUuid, long startTime, long endTime, double price, boolean autoRenew, long lastPayment) {
+    public Rental(int regionId, UUID renterUuid, long startTime, long endTime, double price, boolean autoRenew, long lastPayment, int durationDays) {
         this.regionId = regionId;
         this.renterUuid = renterUuid;
         this.startTime = startTime;
@@ -30,6 +32,7 @@ public class Rental {
         this.price = price;
         this.autoRenew = autoRenew;
         this.lastPayment = lastPayment;
+        this.durationDays = durationDays;
     }
 
     public boolean isExpired() {
@@ -58,4 +61,10 @@ public class Rental {
     public void setAutoRenew(boolean autoRenew) { this.autoRenew = autoRenew; }
     public long getLastPayment() { return lastPayment; }
     public void setLastPayment(long lastPayment) { this.lastPayment = lastPayment; }
+    public int getDurationDays() { return durationDays; }
+    public void setDurationDays(int durationDays) { this.durationDays = durationDays; }
+
+    public long getDurationMillis() {
+        return durationDays * 24L * 60L * 60L * 1000L;
+    }
 }

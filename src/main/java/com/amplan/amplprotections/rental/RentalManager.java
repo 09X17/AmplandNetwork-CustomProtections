@@ -110,7 +110,7 @@ public class RentalManager {
 
         long now = System.currentTimeMillis();
         long endTime = now + (days * 24L * 60L * 60L * 1000L);
-        Rental rental = new Rental(region.getDatabaseId(), owner.getUniqueId(), now, endTime, price, defaultAutoRenew);
+        Rental rental = new Rental(region.getDatabaseId(), owner.getUniqueId(), now, endTime, price, defaultAutoRenew, days);
 
         activeRentals.put(region.getDatabaseId(), rental);
         plugin.getProtectionManager().getProtectionDao().saveRentalAsync(rental);
@@ -158,15 +158,15 @@ public class RentalManager {
         }
 
         long now = System.currentTimeMillis();
-        long endTime = now + (rental.getRemainingSeconds() * 1000L);
-        Rental newRental = new Rental(region.getDatabaseId(), renter.getUniqueId(), now, endTime, rental.getPrice(), rental.isAutoRenew());
+        long endTime = now + rental.getDurationMillis();
+        Rental newRental = new Rental(region.getDatabaseId(), renter.getUniqueId(), now, endTime, rental.getPrice(), rental.isAutoRenew(), rental.getDurationDays());
 
         activeRentals.put(region.getDatabaseId(), newRental);
         plugin.getProtectionManager().getProtectionDao().saveRentalAsync(newRental);
 
         String msg = MessageUtils.lang("rental.accept-success")
                 .replace("%name%", region.getCustomName())
-                .replace("%days%", String.valueOf(Math.max(1, (int) (newRental.getRemainingSeconds() / 86400L))));
+                .replace("%days%", String.valueOf(Math.max(1, newRental.getDurationDays())));
         renter.sendMessage(MiniMessage.miniMessage().deserialize(msg));
 
         Player ownerPlayer = Bukkit.getPlayer(region.getOwnerUniqueId());
@@ -230,7 +230,10 @@ public class RentalManager {
                     Player renter = Bukkit.getPlayer(rental.getRenterUuid());
                     if (renter != null && economy.isEnabled() && economy.hasBalance(renter, rental.getPrice())) {
                         economy.charge(renter, rental.getPrice());
-                        rental.setEndTime(System.currentTimeMillis() + (rental.getRemainingSeconds() * 1000L > 0 ? rental.getRemainingSeconds() * 1000L : 86400000L));
+                        long renewalMillis = rental.getDurationDays() > 0
+                                ? rental.getDurationMillis()
+                                : 86400000L;
+                        rental.setEndTime(System.currentTimeMillis() + renewalMillis);
                         rental.setLastPayment(System.currentTimeMillis());
                         plugin.getProtectionManager().getProtectionDao().saveRentalAsync(rental);
 

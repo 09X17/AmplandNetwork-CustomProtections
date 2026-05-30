@@ -653,13 +653,12 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleRollback(Player player, ProtectionRegion region, String[] args) {
-        if (region == null) {
-            player.sendMessage(mm.deserialize(msg("general.not-in-protection")));
+        if (!player.hasPermission("amplprotections.rollback.admin")) {
+            player.sendMessage(mm.deserialize(msg("general.no-permission")));
             return;
         }
-        if (!region.getOwnerUniqueId().equals(player.getUniqueId())
-                && !player.hasPermission("amplprotections.rollback.admin")) {
-            player.sendMessage(mm.deserialize(msg("members.no-permission-owner")));
+        if (region == null) {
+            player.sendMessage(mm.deserialize(msg("general.not-in-protection")));
             return;
         }
 

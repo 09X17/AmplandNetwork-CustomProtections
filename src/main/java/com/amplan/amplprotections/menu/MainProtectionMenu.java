@@ -705,6 +705,17 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         }
 
         if (slot == hologramSlot && hologramEnabled) {
+            String togglePerm = java.util.Objects.requireNonNullElse(
+                    plugin.getConfig().getString("holograms.toggle-permission"),
+                    "amplprotections.hologram.toggle");
+            if (!player.hasPermission(togglePerm)) {
+                Location loc = player.getLocation();
+                if (loc == null)
+                    return;
+                player.playSound(loc, Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+                player.sendMessage(mm.deserialize(MessageUtils.lang("hologram.no-permission")));
+                return;
+            }
             Location loc = player.getLocation();
             if (loc == null)
                 return;

@@ -55,11 +55,8 @@ permissions:
   amplprotections.rent.create:
     description: Allows putting protections for rent
     default: true
-  amplprotections.rollback.use:
-    description: Allows rollback on own protections
-    default: false
   amplprotections.rollback.admin:
-    description: Allows rollback on any protection
+    description: Allows using rollback commands
     default: op
   amplprotections.hologram.toggle:
     description: Allows toggling holograms
