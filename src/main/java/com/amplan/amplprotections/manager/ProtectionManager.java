@@ -209,9 +209,16 @@ public class ProtectionManager {
 
                         for (Map.Entry<String, com.amplan.amplprotections.model.FlagPermissionLevel> entry : region
                                 .getFlags().entrySet()) {
+                            if (com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(entry.getKey())) continue;
                             psInsert.setInt(1, region.getDatabaseId());
                             psInsert.setString(2, entry.getKey());
                             psInsert.setInt(3, entry.getValue().getValue());
+                            psInsert.addBatch();
+                        }
+                        for (Map.Entry<String, Boolean> entry : region.getBooleanFlags().entrySet()) {
+                            psInsert.setInt(1, region.getDatabaseId());
+                            psInsert.setString(2, entry.getKey());
+                            psInsert.setInt(3, entry.getValue() ? 1 : 0);
                             psInsert.addBatch();
                         }
                     }
@@ -592,6 +599,11 @@ public class ProtectionManager {
                     .entrySet()) {
                 if (!merged.getFlags().containsKey(entry.getKey())) {
                     merged.setFlagLevel(entry.getKey(), entry.getValue());
+                }
+            }
+            for (Map.Entry<String, Boolean> entry : r.getBooleanFlags().entrySet()) {
+                if (!merged.getBooleanFlags().containsKey(entry.getKey())) {
+                    merged.setBooleanFlag(entry.getKey(), entry.getValue());
                 }
             }
             for (Map.Entry<java.util.UUID, com.amplan.amplprotections.model.PlayerRank> entry : r.getMembers()

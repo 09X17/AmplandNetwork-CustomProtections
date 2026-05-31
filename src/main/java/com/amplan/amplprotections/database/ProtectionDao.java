@@ -160,9 +160,16 @@ public class ProtectionDao {
             }
             try (PreparedStatement psI = conn.prepareStatement(insert)) {
                 for (Map.Entry<String, FlagPermissionLevel> entry : region.getFlags().entrySet()) {
+                    if (FlagPermissionLevel.isEnvironmental(entry.getKey())) continue;
                     psI.setInt(1, region.getDatabaseId());
                     psI.setString(2, entry.getKey());
                     psI.setInt(3, entry.getValue().getValue());
+                    psI.addBatch();
+                }
+                for (Map.Entry<String, Boolean> entry : region.getBooleanFlags().entrySet()) {
+                    psI.setInt(1, region.getDatabaseId());
+                    psI.setString(2, entry.getKey());
+                    psI.setInt(3, entry.getValue() ? 1 : 0);
                     psI.addBatch();
                 }
                 psI.executeBatch();
@@ -240,6 +247,21 @@ public class ProtectionDao {
                 ps.executeUpdate();
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error guardando flag", e);
+            }
+        }, mySQL.getDbExecutor());
+    }
+
+    public CompletableFuture<Void> saveBooleanFlagAsync(int regionId, String flagKey, boolean value) {
+        return CompletableFuture.runAsync(() -> {
+            String sql = "REPLACE INTO ap_protection_flags (protection_id, flag_key, flag_value) VALUES (?, ?, ?)";
+            try (Connection conn = mySQL.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, regionId);
+                ps.setString(2, flagKey);
+                ps.setInt(3, value ? 1 : 0);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, "Error guardando boolean flag", e);
             }
         }, mySQL.getDbExecutor());
     }
@@ -400,9 +422,16 @@ public class ProtectionDao {
                     String insertSql = "INSERT INTO ap_protection_flags (protection_id, flag_key, flag_value) VALUES (?, ?, ?)";
                     try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
                         for (java.util.Map.Entry<String, FlagPermissionLevel> entry : region.getFlags().entrySet()) {
+                            if (FlagPermissionLevel.isEnvironmental(entry.getKey())) continue;
                             ps.setInt(1, region.getDatabaseId());
                             ps.setString(2, entry.getKey());
                             ps.setInt(3, entry.getValue().getValue());
+                            ps.addBatch();
+                        }
+                        for (java.util.Map.Entry<String, Boolean> entry : region.getBooleanFlags().entrySet()) {
+                            ps.setInt(1, region.getDatabaseId());
+                            ps.setString(2, entry.getKey());
+                            ps.setInt(3, entry.getValue() ? 1 : 0);
                             ps.addBatch();
                         }
                         ps.executeBatch();

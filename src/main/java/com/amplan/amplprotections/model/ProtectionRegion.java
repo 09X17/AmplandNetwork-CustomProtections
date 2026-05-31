@@ -26,6 +26,7 @@ public class ProtectionRegion {
     private boolean hologramEnabled;
 
     private final ConcurrentHashMap<String, FlagPermissionLevel> flags = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Boolean> booleanFlags = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, PlayerRank> members = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, Long> memberJoinDates = new ConcurrentHashMap<>();
 
@@ -101,19 +102,21 @@ public class ProtectionRegion {
 
     private void setDefaultFlags() {
         String[] flagsOwner = {
-            "pvp", "mob-damage", "entity-damage", "tnt", "explosions", "potion-splash",
+            "pvp", "mob-damage", "entity-damage", "potion-splash",
             "block-break", "block-place",
             "use-doors", "use-switches", "use-chests", "use-crafting", "use-animals",
             "use-portals", "use-beds", "use-villager",
             "frame-rotate", "frame-break", "armor-stand-edit", "painting-break",
-            "vehicle-place", "vehicle-break", "item-drop", "item-pickup"
+            "vehicle-place", "vehicle-break", "item-drop", "item-pickup", "entry"
         };
-        String[] flagsEveryone = {
-            "mob-spawn", "leaf-decay", "fire-spread", "fire-damage", "fire-ignite",
+        String[] booleanFlagsDefault = {
+            "mob-spawn", "tnt", "explosions", "leaf-decay", "fire-spread", "fire-damage", "fire-ignite",
             "lava-flow", "water-flow", "ice-melt", "snow-melt", "crop-trample", "soil-dry"
         };
         for (String f : flagsOwner) flags.put(f, FlagPermissionLevel.OWNER);
-        for (String f : flagsEveryone) flags.put(f, FlagPermissionLevel.EVERYONE);
+        for (String f : booleanFlagsDefault) {
+            booleanFlags.put(f, true);
+        }
     }
 
     public boolean intersects(ProtectionRegion other) {
@@ -129,8 +132,8 @@ public class ProtectionRegion {
     }
 
     public boolean isPvpEnabled() { return getFlagLevel("pvp") != FlagPermissionLevel.NONE; }
-    public boolean isTntEnabled() { return getFlagLevel("tnt") != FlagPermissionLevel.NONE; }
-    public boolean isMobSpawnEnabled() { return getFlagLevel("mob-spawn") == FlagPermissionLevel.EVERYONE; }
+    public boolean isTntEnabled() { return isBooleanFlagEnabled("tnt"); }
+    public boolean isMobSpawnEnabled() { return isBooleanFlagEnabled("mob-spawn"); }
     public int getRadius() { return (maxX - minX) / 2; }
 
     public String getOwnerName() {
@@ -144,11 +147,26 @@ public class ProtectionRegion {
     }
 
     public void setFlag(String flag, boolean value) {
-        flags.put(flag.toLowerCase(), FlagPermissionLevel.fromBoolean(value));
+        String key = flag.toLowerCase();
+        if (FlagPermissionLevel.isEnvironmental(key)) {
+            setBooleanFlag(key, value);
+        } else {
+            flags.put(key, FlagPermissionLevel.fromBoolean(value));
+        }
     }
 
     public void setFlagLevel(String flag, FlagPermissionLevel level) {
-        flags.put(flag.toLowerCase(), level);
+        String key = flag.toLowerCase();
+        if (FlagPermissionLevel.isEnvironmental(key)) {
+            setBooleanFlag(key, level == FlagPermissionLevel.EVERYONE);
+        } else {
+            flags.put(key, level);
+        }
+    }
+
+    public void setBooleanFlag(String flag, boolean value) {
+        String key = flag.toLowerCase();
+        booleanFlags.put(key, value);
     }
 
     public FlagPermissionLevel getFlagLevel(String flag) {
@@ -158,6 +176,12 @@ public class ProtectionRegion {
     public boolean isFlagEnabled(String flag) {
         return getFlagLevel(flag) == FlagPermissionLevel.EVERYONE;
     }
+
+    public boolean isBooleanFlagEnabled(String flag) {
+        return booleanFlags.getOrDefault(flag.toLowerCase(), false);
+    }
+
+    public Map<String, Boolean> getBooleanFlags() { return booleanFlags; }
 
     @Deprecated
     public boolean isAllowed(String flag) {

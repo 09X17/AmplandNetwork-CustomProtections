@@ -166,6 +166,7 @@ access-denied:
   pvp: "%prefix%<red>✘ El PvP no está permitido en esta zona."
   tnt: "%prefix%<red>✘ La TNT está desactivada en esta zona."
   explosions: "%prefix%<red>✘ Las explosiones están desactivadas aquí."
+  entry: "%prefix%<red>✘ No tienes permiso para entrar a esta zona protegida."
 
 search:
   empty-query: "%prefix%<red>Escribe un nombre de jugador válido."

@@ -179,8 +179,11 @@ preset-button:
   lore:
   - <gray>Click to apply a flag preset
 
-# You can define custom items for each flag state (none, owner, members, admins, everyone) using material, custom model data, or skull value
-# Use: custom-model-data for custom textures, skull for player heads, or material for standard items. Display name and lore can also be customized with placeholders.
+# You can define custom items for each flag state using material, custom model data, or skull value
+# Granular flags (5 levels): none, owner, members, admins, everyone
+# Boolean flags (enabled/disabled): enabled, disabled
+# Set type to "skull" and provide skull-value with base64 textures to use custom heads
+# If skull-value is provided (non-empty), skull is used automatically regardless of type
 flag-item:
   type: custom-model-data
   material:
@@ -189,6 +192,8 @@ flag-item:
     members: PAPER
     admins: PAPER
     everyone: PAPER
+    disabled: PAPER
+    enabled: PAPER
 
   custom-model-data:
     none: 90003
@@ -196,6 +201,8 @@ flag-item:
     members: 90003
     admins: 90003
     everyone: 90001
+    disabled: 90003
+    enabled: 90001
 
   skull-value:
     none: ""
@@ -203,8 +210,9 @@ flag-item:
     members: ""
     admins: ""
     everyone: ""
+    disabled: ""
+    enabled: ""
 
-# Custom flags
 flags:
   pvp:
     display-name: <u><b><#B0FFC4>PLAYER VS PLAYER</#B0FFC4>
@@ -484,4 +492,12 @@ flags:
     - ''
     - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
     - ' <reset><yellow>▸ <gray>%description% item pickup</gray>'
+    - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'
+
+  entry:
+    display-name: <u><b><#B0FFC4>ENTRY ACCESS</#B0FFC4></b>
+    lore:
+    - ''
+    - ' <reset><yellow>▸ <gray>Permission: <#FFF8BA>%state%</#FFF8BA>'
+    - ' <reset><yellow>▸ <gray>%description% entry to this zone</gray>'
     - ' <reset><yellow>▸ <gray>Left click: next | Right click: previous</gray>'

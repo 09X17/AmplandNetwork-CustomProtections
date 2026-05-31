@@ -69,6 +69,7 @@ flags:
   - vehicle-break
   - item-drop
   - item-pickup
+  - entry
   # Flags that don't show access denied message (only cancel the action silently)
   silent-flags:
   - item-pickup
@@ -188,6 +189,7 @@ presets:
         vehicle-break: EVERYONE
         item-drop: EVERYONE
         item-pickup: EVERYONE
+        entry: EVERYONE
     private:
       description: "Only the owner can interact"
       flags:
@@ -214,6 +216,7 @@ presets:
         vehicle-break: OWNER
         item-drop: OWNER
         item-pickup: OWNER
+        entry: OWNER
     friends:
       description: "Members and higher ranks can interact"
       flags:
@@ -240,6 +243,7 @@ presets:
         vehicle-break: MEMBERS
         item-drop: MEMBERS
         item-pickup: MEMBERS
+        entry: MEMBERS
 
 rental:
   enabled: true

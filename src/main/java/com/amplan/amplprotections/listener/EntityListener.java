@@ -104,7 +104,7 @@ public class EntityListener implements Listener {
                     blockIterator.remove();
                     continue;
                 }
-                if (!region.isFlagEnabled("tnt")) {
+                if (!region.isBooleanFlagEnabled("tnt") || !region.isBooleanFlagEnabled("explosions")) {
                     blockIterator.remove();
                 }
             }
@@ -128,7 +128,7 @@ public class EntityListener implements Listener {
                     continue;
                 }
 
-                if (!region.isFlagEnabled("tnt")) {
+                if (!region.isBooleanFlagEnabled("tnt") || !region.isBooleanFlagEnabled("explosions")) {
                     blockIterator.remove();
                 }
             }

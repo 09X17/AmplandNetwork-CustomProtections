@@ -408,20 +408,27 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
     }
 
     private void buildFlagItem(String flag, int slot, ConfigurationSection menuConfig) {
+        boolean isBool = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(flag);
+        boolean boolEnabled = isBool && region.isBooleanFlagEnabled(flag);
+
         com.amplan.amplprotections.model.FlagPermissionLevel level = region.getFlagLevel(flag);
         String levelKey = level.name().toLowerCase();
+        String boolKey = boolEnabled ? "enabled" : "disabled";
+        String lookupKey = isBool ? boolKey : levelKey;
 
+        // Siempre leer del config del servidor, nunca del JAR
         ConfigurationSection flagItemGlobal = plugin.getMenuConfigManager().getMainMenu()
                 .getConfigurationSection("flag-item");
 
-        String globalType = flagItemGlobal != null ? flagItemGlobal.getString("type", "custom-model-data")
+        String globalType = flagItemGlobal != null
+                ? flagItemGlobal.getString("type", "custom-model-data")
                 : "custom-model-data";
 
         Material globalMaterial = Material.PAPER;
         if (flagItemGlobal != null) {
             ConfigurationSection matSection = flagItemGlobal.getConfigurationSection("material");
             if (matSection != null) {
-                String matName = matSection.getString(levelKey, null);
+                String matName = matSection.getString(lookupKey, null);
                 if (matName != null) {
                     try {
                         globalMaterial = Material.valueOf(matName);
@@ -433,10 +440,21 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
             }
         }
 
-        int globalCmd = flagItemGlobal != null ? flagItemGlobal.getInt("custom-model-data." + levelKey, -1) : -1;
-        String globalSkull = flagItemGlobal != null
-                ? getConfigString(flagItemGlobal.getConfigurationSection("skull-value"), levelKey, "")
-                : "";
+        int globalCmd = flagItemGlobal != null
+                ? flagItemGlobal.getInt("custom-model-data." + lookupKey, -1)
+                : -1;
+
+        // Fix: doble intento de lectura del skull-value porque Bukkit a veces
+        // no parsea el mapa como ConfigurationSection correctamente
+        String globalSkull = "";
+        if (flagItemGlobal != null) {
+            ConfigurationSection skullSection = flagItemGlobal.getConfigurationSection("skull-value");
+            if (skullSection != null) {
+                globalSkull = skullSection.getString(lookupKey, "");
+            } else {
+                globalSkull = flagItemGlobal.getString("skull-value." + lookupKey, "");
+            }
+        }
 
         Material material = globalMaterial;
         int customModelData = globalCmd;
@@ -454,11 +472,10 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
                     } catch (IllegalArgumentException ignored) {
                     }
                 }
-                String cmdPath = "custom-model-data-" + levelKey;
-                int flagCmd = flagSection.getInt(cmdPath, -1);
+                int flagCmd = flagSection.getInt("custom-model-data-" + lookupKey, -1);
                 if (flagCmd != -1)
                     customModelData = flagCmd;
-                String flagSkull = flagSection.getString("skull-value-" + levelKey, null);
+                String flagSkull = flagSection.getString("skull-value-" + lookupKey, null);
                 if (flagSkull != null)
                     skullValue = flagSkull;
                 displayName = flagSection.getString("display-name");
@@ -466,28 +483,38 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
             }
         }
 
-        boolean useSkull = "skull".equals(globalType)
-                || (material == Material.PLAYER_HEAD
-                        && !skullValue.isEmpty());
+        boolean useSkull = "skull".equals(globalType);
 
         ItemStack item;
         if (useSkull && skullValue != null && !skullValue.isEmpty()) {
             item = SkullUtils.createSkullWithTexture(skullValue);
+        } else if (useSkull) {
+            item = new ItemStack(Material.PLAYER_HEAD);
         } else {
             item = new ItemStack(material);
         }
 
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            String levelColor = switch (level) {
-                case NONE -> "<red>";
-                case OWNER -> "<gold>";
-                case MEMBERS -> "<green>";
-                case ADMINS -> "<yellow>";
-                case EVERYONE -> "<aqua>";
-            };
-            String levelDisplay = level.getDisplayName();
-            String levelDesc = level.getDescription();
+            String levelColor;
+            String levelDisplay;
+            String levelDesc;
+
+            if (isBool) {
+                levelColor = boolEnabled ? "<green>" : "<red>";
+                levelDisplay = boolEnabled ? "<green>ON" : "<red>OFF";
+                levelDesc = boolEnabled ? "<green>Activado" : "<red>Desactivado";
+            } else {
+                levelColor = switch (level) {
+                    case NONE -> "<red>";
+                    case OWNER -> "<gold>";
+                    case MEMBERS -> "<green>";
+                    case ADMINS -> "<yellow>";
+                    case EVERYONE -> "<aqua>";
+                };
+                levelDisplay = level.getDisplayName();
+                levelDesc = level.getDescription();
+            }
 
             if (displayName != null) {
                 meta.displayName(mm.deserialize(displayName
@@ -508,11 +535,11 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
                                 .replace("%description%", levelDesc)))
                         .toList();
             } else {
-                boolean isEnvironmental = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(flag);
-                String hint = isEnvironmental ? "<gray>Clic para activar/desactivar"
+                String hint = isBool
+                        ? "<gray>Clic para activar/desactivar"
                         : "<gray>Clic izq: siguiente | Clic der: anterior";
                 lore = List.of(
-                        mm.deserialize("<gray>Permiso: " + levelColor + levelDisplay),
+                        mm.deserialize("<gray>Estado: " + levelColor + levelDisplay),
                         mm.deserialize(levelDesc),
                         mm.deserialize(hint));
             }
@@ -780,40 +807,47 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
 
         if (slotToFlag.containsKey(slot)) {
             String flag = slotToFlag.get(slot);
-            com.amplan.amplprotections.model.FlagPermissionLevel currentLevel = region.getFlagLevel(flag);
-            com.amplan.amplprotections.model.FlagPermissionLevel newLevel;
-            boolean isEnvironmental = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(flag);
+            boolean isBool = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(flag);
 
-            if (isEnvironmental) {
-                if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
-                    newLevel = currentLevel.previousSimple();
-                } else {
-                    newLevel = currentLevel.nextSimple();
-                }
+            if (isBool) {
+                boolean current = region.isBooleanFlagEnabled(flag);
+                boolean newVal = !current;
+                region.setBooleanFlag(flag, newVal);
+                plugin.getProtectionManager().getProtectionDao().saveBooleanFlagAsync(region.getDatabaseId(), flag,
+                        newVal);
+
+                String stateMsg = newVal ? "<green>ON" : "<red>OFF";
+                String flagMsg = MessageUtils.lang("commands.flag-changed")
+                        .replace("%flag%", flag.toUpperCase())
+                        .replace("%level%", stateMsg)
+                        .replace("%mode%", "<gray>(booleana)");
+                player.sendMessage(mm.deserialize(flagMsg));
             } else {
+                com.amplan.amplprotections.model.FlagPermissionLevel currentLevel = region.getFlagLevel(flag);
+                com.amplan.amplprotections.model.FlagPermissionLevel newLevel;
+
                 if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
                     newLevel = currentLevel.previous();
                 } else {
                     newLevel = currentLevel.next();
                 }
+
+                region.setFlagLevel(flag, newLevel);
+                plugin.getProtectionManager().getProtectionDao().saveFlagAsync(region.getDatabaseId(), flag, newLevel);
+
+                String levelMsg = switch (newLevel) {
+                    case NONE -> "<red>Nadie";
+                    case OWNER -> "<gold>Solo dueño";
+                    case MEMBERS -> "<green>Solo miembros";
+                    case ADMINS -> "<yellow>Solo admins+";
+                    case EVERYONE -> "<aqua>Todos";
+                };
+                String flagMsg = MessageUtils.lang("commands.flag-changed")
+                        .replace("%flag%", flag.toUpperCase())
+                        .replace("%level%", levelMsg)
+                        .replace("%mode%", "");
+                player.sendMessage(mm.deserialize(flagMsg));
             }
-
-            region.setFlagLevel(flag, newLevel);
-            plugin.getProtectionManager().getProtectionDao().saveFlagAsync(region.getDatabaseId(), flag, newLevel);
-
-            String levelMsg = switch (newLevel) {
-                case NONE -> "<red>Nadie";
-                case OWNER -> "<gold>Solo dueño";
-                case MEMBERS -> "<green>Solo miembros";
-                case ADMINS -> "<yellow>Solo admins+";
-                case EVERYONE -> "<aqua>Todos";
-            };
-            String modeHint = isEnvironmental ? "<gray>(simple)" : "";
-            String flagMsg = MessageUtils.lang("commands.flag-changed")
-                    .replace("%flag%", flag.toUpperCase())
-                    .replace("%level%", levelMsg)
-                    .replace("%mode%", modeHint);
-            player.sendMessage(mm.deserialize(flagMsg));
 
             Location loc = player.getLocation();
             if (loc == null)

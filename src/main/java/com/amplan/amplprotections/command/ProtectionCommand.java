@@ -153,7 +153,12 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
         }
 
         List<String> enabledFlags = plugin.getConfig().getStringList("flags.enabled");
-        long enabledCount = enabledFlags.stream().filter(region::isFlagEnabled).count();
+        long enabledCount = enabledFlags.stream().filter(f -> {
+            if (com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(f)) {
+                return region.isBooleanFlagEnabled(f);
+            }
+            return region.isFlagEnabled(f);
+        }).count();
         long disabledCount = enabledFlags.size() - enabledCount;
 
         player.sendMessage(mm.deserialize(msg("info.flags-summary")
@@ -760,20 +765,41 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        String input = args[2].toLowerCase();
-        com.amplan.amplprotections.model.FlagPermissionLevel level;
-        try {
-            level = com.amplan.amplprotections.model.FlagPermissionLevel.valueOf(input.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            level = Boolean.parseBoolean(input) ? com.amplan.amplprotections.model.FlagPermissionLevel.EVERYONE
-                    : com.amplan.amplprotections.model.FlagPermissionLevel.NONE;
-        }
+        boolean isBool = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(flag);
 
-        region.setFlagLevel(flag, level);
-        plugin.getProtectionManager().getProtectionDao().saveFlagAsync(region.getDatabaseId(), flag, level);
-        player.sendMessage(mm.deserialize(msg("commands.flag-updated")
-                .replace("%flag%", flag.toUpperCase())
-                .replace("%value%", level.getDisplayName())));
+        if (isBool) {
+            String input = args[2].toLowerCase();
+            boolean boolValue;
+            switch (input) {
+                case "true", "on", "1" -> boolValue = true;
+                case "false", "off", "0" -> boolValue = false;
+                default -> {
+                    player.sendMessage(mm.deserialize("<red>✘ Valor inválido. Usa: true/false, on/off, 1/0"));
+                    return;
+                }
+            }
+            region.setBooleanFlag(flag, boolValue);
+            plugin.getProtectionManager().getProtectionDao().saveBooleanFlagAsync(region.getDatabaseId(), flag, boolValue);
+            String stateMsg = boolValue ? "<green>ON" : "<red>OFF";
+            player.sendMessage(mm.deserialize(msg("commands.flag-updated")
+                    .replace("%flag%", flag.toUpperCase())
+                    .replace("%value%", stateMsg)));
+        } else {
+            String input = args[2].toLowerCase();
+            com.amplan.amplprotections.model.FlagPermissionLevel level;
+            try {
+                level = com.amplan.amplprotections.model.FlagPermissionLevel.valueOf(input.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                level = Boolean.parseBoolean(input) ? com.amplan.amplprotections.model.FlagPermissionLevel.EVERYONE
+                        : com.amplan.amplprotections.model.FlagPermissionLevel.NONE;
+            }
+
+            region.setFlagLevel(flag, level);
+            plugin.getProtectionManager().getProtectionDao().saveFlagAsync(region.getDatabaseId(), flag, level);
+            player.sendMessage(mm.deserialize(msg("commands.flag-updated")
+                    .replace("%flag%", flag.toUpperCase())
+                    .replace("%value%", level.getDisplayName())));
+        }
     }
 
     private boolean canManageMembers(Player player, ProtectionRegion region) {
@@ -827,42 +853,77 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
             flagKeys.sort(String::compareToIgnoreCase);
 
             for (String flag : flagKeys) {
-                com.amplan.amplprotections.model.FlagPermissionLevel level = region.getFlagLevel(flag);
-                boolean canAct = region.canPlayerAct(flag, player.getUniqueId());
-                String canActColor = canAct ? "<green>SÍ" : "<red>NO";
-                player.sendMessage(mm.deserialize("<gray>" + flag + ": <white>" + level.getDisplayName()
-                        + " <gray>| Puedes actuar: " + canActColor));
+                boolean isBool = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(flag);
+                if (isBool) {
+                    boolean enabled = region.isBooleanFlagEnabled(flag);
+                    String stateColor = enabled ? "<green>ON" : "<red>OFF";
+                    player.sendMessage(mm.deserialize("<gray>" + flag + ": <white>" + stateColor
+                            + " <gray>| Booleana"));
+                } else {
+                    com.amplan.amplprotections.model.FlagPermissionLevel level = region.getFlagLevel(flag);
+                    boolean canAct = region.canPlayerAct(flag, player.getUniqueId());
+                    String canActColor = canAct ? "<green>SÍ" : "<red>NO";
+                    player.sendMessage(mm.deserialize("<gray>" + flag + ": <white>" + level.getDisplayName()
+                            + " <gray>| Puedes actuar: " + canActColor));
+                }
             }
 
             if (args.length > 1) {
                 String testFlag = args[1].toLowerCase();
-                com.amplan.amplprotections.model.FlagPermissionLevel testLevel = region.getFlagLevel(testFlag);
-                boolean testCanAct = region.canPlayerAct(testFlag, player.getUniqueId());
-                boolean testCanPerform = region.canPerformAction(testFlag, region.getRank(player.getUniqueId()));
+                boolean testIsBool = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(testFlag);
 
                 player.sendMessage(mm.deserialize(""));
                 player.sendMessage(mm.deserialize("<yellow><b>=== Test de Flag: " + testFlag + " ===</b></yellow>"));
-                player.sendMessage(mm.deserialize("<gray>Flag Level: <white>" + testLevel.getDisplayName() + " (value: "
-                        + testLevel.getValue() + ")"));
-                player.sendMessage(mm.deserialize("<gray>canPlayerAct: <white>" + testCanAct));
-                player.sendMessage(mm.deserialize("<gray>canPerformAction (con rank): <white>" + testCanPerform));
-                player.sendMessage(mm.deserialize("<gray>isFlagEnabled: <white>" + region.isFlagEnabled(testFlag)));
 
-                if (args.length > 2) {
-                    String newLevelStr = args[2].toUpperCase();
-                    try {
-                        com.amplan.amplprotections.model.FlagPermissionLevel newLevel = com.amplan.amplprotections.model.FlagPermissionLevel
-                                .valueOf(newLevelStr);
-                        region.setFlagLevel(testFlag, newLevel);
-                        manager.getProtectionDao().saveFlagAsync(region.getDatabaseId(), testFlag, newLevel);
-                        boolean afterCanAct = region.canPlayerAct(testFlag, player.getUniqueId());
+                if (testIsBool) {
+                    boolean testEnabled = region.isBooleanFlagEnabled(testFlag);
+                    player.sendMessage(mm.deserialize("<gray>Tipo: <white>Booleana"));
+                    player.sendMessage(mm.deserialize("<gray>isBooleanFlagEnabled: <white>" + testEnabled));
+
+                    if (args.length > 2) {
+                        String newValStr = args[2].toLowerCase();
+                        boolean newVal;
+                        switch (newValStr) {
+                            case "true", "on", "1" -> newVal = true;
+                            case "false", "off", "0" -> newVal = false;
+                            default -> {
+                                player.sendMessage(mm.deserialize("<red>Valor inválido. Usa: true/false, on/off, 1/0"));
+                                return;
+                            }
+                        }
+                        region.setBooleanFlag(testFlag, newVal);
+                        manager.getProtectionDao().saveBooleanFlagAsync(region.getDatabaseId(), testFlag, newVal);
                         player.sendMessage(mm.deserialize(
-                                "<green>Flag " + testFlag + " cambiada a: <white>" + newLevel.getDisplayName()));
-                        player.sendMessage(
-                                mm.deserialize("<gray>canPlayerAct después del cambio: <white>" + afterCanAct));
-                    } catch (IllegalArgumentException e) {
-                        player.sendMessage(
-                                mm.deserialize("<red>Nivel inválido. Usa: NONE, OWNER, MEMBERS, ADMINS, EVERYONE"));
+                                "<green>Flag " + testFlag + " cambiada a: <white>" + (newVal ? "ON" : "OFF")));
+                    }
+                } else {
+                    com.amplan.amplprotections.model.FlagPermissionLevel testLevel = region.getFlagLevel(testFlag);
+                    boolean testCanAct = region.canPlayerAct(testFlag, player.getUniqueId());
+                    boolean testCanPerform = region.canPerformAction(testFlag, region.getRank(player.getUniqueId()));
+
+                    player.sendMessage(mm.deserialize("<gray>Tipo: <white>Granular"));
+                    player.sendMessage(mm.deserialize("<gray>Flag Level: <white>" + testLevel.getDisplayName() + " (value: "
+                            + testLevel.getValue() + ")"));
+                    player.sendMessage(mm.deserialize("<gray>canPlayerAct: <white>" + testCanAct));
+                    player.sendMessage(mm.deserialize("<gray>canPerformAction (con rank): <white>" + testCanPerform));
+                    player.sendMessage(mm.deserialize("<gray>isFlagEnabled: <white>" + region.isFlagEnabled(testFlag)));
+
+                    if (args.length > 2) {
+                        String newLevelStr = args[2].toUpperCase();
+                        try {
+                            com.amplan.amplprotections.model.FlagPermissionLevel newLevel = com.amplan.amplprotections.model.FlagPermissionLevel
+                                    .valueOf(newLevelStr);
+                            region.setFlagLevel(testFlag, newLevel);
+                            manager.getProtectionDao().saveFlagAsync(region.getDatabaseId(), testFlag, newLevel);
+                            boolean afterCanAct = region.canPlayerAct(testFlag, player.getUniqueId());
+                            player.sendMessage(mm.deserialize(
+                                    "<green>Flag " + testFlag + " cambiada a: <white>" + newLevel.getDisplayName()));
+                            player.sendMessage(
+                                    mm.deserialize("<gray>canPlayerAct después del cambio: <white>" + afterCanAct));
+                        } catch (IllegalArgumentException e) {
+                            player.sendMessage(
+                                    mm.deserialize("<red>Nivel inválido. Usa: NONE, OWNER, MEMBERS, ADMINS, EVERYONE"));
+                        }
                     }
                 }
             }
@@ -924,9 +985,17 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
             }
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("flag")) {
+            String flag = args[1].toLowerCase();
+            if (com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(flag)) {
+                return List.of("true", "false");
+            }
             return List.of("NONE", "OWNER", "MEMBERS", "ADMINS", "EVERYONE");
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("debug")) {
+            String debugFlag = args[1].toLowerCase();
+            if (com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(debugFlag)) {
+                return List.of("true", "false");
+            }
             return List.of("NONE", "OWNER", "MEMBERS", "ADMINS", "EVERYONE");
         }
         return null;

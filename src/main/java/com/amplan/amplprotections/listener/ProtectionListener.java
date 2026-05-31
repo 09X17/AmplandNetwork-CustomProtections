@@ -240,7 +240,7 @@ public class ProtectionListener implements Listener {
         if (region.isMember(player.getUniqueId()) || player.hasPermission("amplprotections.admin.bypass"))
             return;
         if (clickedBlock.getType() == Material.FARMLAND) {
-            if (!region.canPlayerAct("crop-trample", player.getUniqueId())) {
+            if (!region.isBooleanFlagEnabled("crop-trample")) {
                 event.setCancelled(true);
             }
         } else {
@@ -257,13 +257,21 @@ public class ProtectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onAnimalInteract(PlayerInteractEntityEvent event) {
+        if (!(event.getRightClicked() instanceof org.bukkit.entity.Animals))
+            return;
+        if (!canAct(event.getRightClicked().getLocation(), "use-animals", event.getPlayer()))
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onMobSpawn(CreatureSpawnEvent event) {
         ProtectionRegion region = manager.getRegionAt(event.getLocation());
         if (region != null && !region.isMobSpawnEnabled())
             event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (event.getFrom().getBlockX() == event.getTo().getBlockX() &&
                 event.getFrom().getBlockY() == event.getTo().getBlockY() &&
@@ -276,6 +284,11 @@ public class ProtectionListener implements Listener {
         ProtectionRegion last = lastRegion.get(uuid);
 
         if (to != null && !to.equals(last)) {
+            if (!player.hasPermission("amplprotections.admin.bypass") && !to.canPlayerAct("entry", uuid)) {
+                event.setCancelled(true);
+                sendAccessDenied(player, "entry");
+                return;
+            }
             String ownerName = manager.getCachedOwnerName(to.getOwnerUniqueId());
             String enterMsg = MessageUtils.lang("protection.enter").replace("%owner%", ownerName);
             player.sendActionBar(mm.deserialize(enterMsg));
@@ -291,14 +304,14 @@ public class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
         ProtectionRegion region = manager.getRegionAt(event.getBlock().getLocation());
-        if (region != null && !region.isFlagEnabled("fire-spread"))
+        if (region != null && !region.isBooleanFlagEnabled("fire-spread"))
             event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent event) {
         ProtectionRegion region = manager.getRegionAt(event.getBlock().getLocation());
-        if (region != null && !region.isFlagEnabled("fire-ignite"))
+        if (region != null && !region.isBooleanFlagEnabled("fire-ignite"))
             event.setCancelled(true);
     }
 
@@ -311,7 +324,7 @@ public class ProtectionListener implements Listener {
         String flag = event.getBlock().isLiquid()
                 ? (event.getBlock().getType().name().contains("LAVA") ? "lava-flow" : "water-flow")
                 : null;
-        if (flag != null && !region.isFlagEnabled(flag))
+        if (flag != null && !region.isBooleanFlagEnabled(flag))
             event.setCancelled(true);
     }
 
@@ -445,10 +458,8 @@ public class ProtectionListener implements Listener {
             return;
         }
         if (block.getType() == Material.FARMLAND) {
-            if (!canAct(
-                    block.getLocation(),
-                    "crop-trample",
-                    event.getPlayer())) {
+            ProtectionRegion region = manager.getRegionAt(block.getLocation());
+            if (region != null && !region.isBooleanFlagEnabled("crop-trample")) {
                 event.setCancelled(true);
             }
         }
@@ -458,7 +469,7 @@ public class ProtectionListener implements Listener {
     public void onSoilDry(BlockFadeEvent event) {
         if (event.getBlock().getType() == Material.FARMLAND) {
             ProtectionRegion region = manager.getRegionAt(event.getBlock().getLocation());
-            if (region != null && !region.isFlagEnabled("soil-dry")) {
+            if (region != null && !region.isBooleanFlagEnabled("soil-dry")) {
                 event.setCancelled(true);
             }
         }
@@ -470,7 +481,7 @@ public class ProtectionListener implements Listener {
                 event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK ||
                 event.getCause() == EntityDamageEvent.DamageCause.LAVA) {
             ProtectionRegion region = manager.getRegionAt(event.getEntity().getLocation());
-            if (region != null && !region.isFlagEnabled("fire-damage")) {
+            if (region != null && !region.isBooleanFlagEnabled("fire-damage")) {
                 event.setCancelled(true);
             }
         }
@@ -481,7 +492,7 @@ public class ProtectionListener implements Listener {
         Material type = event.getBlock().getType();
         if (type == Material.ICE || type == Material.PACKED_ICE || type == Material.BLUE_ICE) {
             ProtectionRegion region = manager.getRegionAt(event.getBlock().getLocation());
-            if (region != null && !region.isFlagEnabled("ice-melt")) {
+            if (region != null && !region.isBooleanFlagEnabled("ice-melt")) {
                 event.setCancelled(true);
             }
         }
@@ -492,7 +503,7 @@ public class ProtectionListener implements Listener {
         Material type = event.getBlock().getType();
         if (type == Material.SNOW || type == Material.SNOW_BLOCK) {
             ProtectionRegion region = manager.getRegionAt(event.getBlock().getLocation());
-            if (region != null && !region.isFlagEnabled("snow-melt")) {
+            if (region != null && !region.isBooleanFlagEnabled("snow-melt")) {
                 event.setCancelled(true);
             }
         }
@@ -501,7 +512,7 @@ public class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLeafDecay(org.bukkit.event.block.LeavesDecayEvent event) {
         ProtectionRegion region = manager.getRegionAt(event.getBlock().getLocation());
-        if (region != null && !region.isFlagEnabled("leaf-decay")) {
+        if (region != null && !region.isBooleanFlagEnabled("leaf-decay")) {
             event.setCancelled(true);
         }
     }
