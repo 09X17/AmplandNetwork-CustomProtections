@@ -21,18 +21,20 @@ import com.amplan.amplprotections.model.ProtectionRegion;
 public class ProtectionDao {
 
     private final AmplProtections plugin;
-    private final MySQLConnection mySQL;
 
     public ProtectionDao(AmplProtections plugin) {
         this.plugin = plugin;
-        this.mySQL = plugin.getMySQLConnection();
+    }
+
+    private DatabaseConnection getDb() {
+        return plugin.getDatabaseConnection();
     }
 
     public List<ProtectionRegion> loadAllRegionsSync() {
         List<ProtectionRegion> regions = new ArrayList<>();
         String selectRegions = "SELECT * FROM ap_protections";
 
-        try (Connection conn = mySQL.getConnection();
+        try (Connection conn = getDb().getConnection();
                 PreparedStatement ps = conn.prepareStatement(selectRegions);
                 ResultSet rs = ps.executeQuery()) {
 
@@ -100,12 +102,12 @@ public class ProtectionDao {
             } else {
                 updateRegion(region);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     private void insertNewRegion(ProtectionRegion region) {
         String sql = "INSERT INTO ap_protections (land_id, owner_uuid, world_name, custom_name, custom_lore, block_x, block_y, block_z, min_x, max_x, min_z, max_z, block_type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        try (Connection conn = mySQL.getConnection();
+        try (Connection conn = getDb().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, region.getLandId());
             ps.setString(2, region.getOwnerUniqueId().toString());
@@ -131,29 +133,49 @@ public class ProtectionDao {
             saveFlags(region);
             saveMemberSync(region.getDatabaseId(), region.getOwnerUniqueId(), "OWNER");
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Error insertando región", e);
+            plugin.getLogger().log(Level.SEVERE, "Error insertando region", e);
         }
     }
 
     private void saveMemberSync(int regionId, UUID playerUuid, String rank) {
-        String sql = "INSERT INTO ap_protection_members (protection_id, player_uuid, rank_level, joined_at) VALUES (?, ?, ?, UNIX_TIMESTAMP() * 1000) "
-                +
-                "ON DUPLICATE KEY UPDATE rank_level = VALUES(rank_level)";
-        try (Connection conn = mySQL.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, regionId);
-            ps.setString(2, playerUuid.toString());
-            ps.setString(3, rank);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Error guardando miembro", e);
+        SqlDialect dialect = getDb().getDialect();
+        String sql;
+        if (dialect.getTimestampFunction() != null) {
+            sql = "INSERT INTO ap_protection_members (protection_id, player_uuid, rank_level, joined_at) VALUES (?, ?, ?, " + dialect.getTimestampFunction() + ") " +
+                    "ON DUPLICATE KEY UPDATE rank_level = VALUES(rank_level)";
+            try (Connection conn = getDb().getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, regionId);
+                ps.setString(2, playerUuid.toString());
+                ps.setString(3, rank);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, "Error guardando miembro", e);
+            }
+        } else {
+            sql = dialect.getUpsertWithUpdateSql(
+                    "ap_protection_members",
+                    new String[]{"protection_id", "player_uuid", "rank_level", "joined_at"},
+                    new String[]{"protection_id", "player_uuid"},
+                    new String[]{"rank_level", "joined_at"}
+            );
+            try (Connection conn = getDb().getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, regionId);
+                ps.setString(2, playerUuid.toString());
+                ps.setString(3, rank);
+                ps.setLong(4, System.currentTimeMillis());
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, "Error guardando miembro", e);
+            }
         }
     }
 
     private void saveFlags(ProtectionRegion region) {
         String delete = "DELETE FROM ap_protection_flags WHERE protection_id = ?";
         String insert = "INSERT INTO ap_protection_flags (protection_id, flag_key, flag_value) VALUES (?,?,?)";
-        try (Connection conn = mySQL.getConnection()) {
+        try (Connection conn = getDb().getConnection()) {
             try (PreparedStatement psD = conn.prepareStatement(delete)) {
                 psD.setInt(1, region.getDatabaseId());
                 psD.executeUpdate();
@@ -181,14 +203,14 @@ public class ProtectionDao {
 
     private void updateRegion(ProtectionRegion region) {
         String sql = "UPDATE ap_protections SET custom_name = ?, custom_lore = ? WHERE id = ?";
-        try (Connection conn = mySQL.getConnection();
+        try (Connection conn = getDb().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, region.getCustomName());
             ps.setString(2, region.getCustomLore());
             ps.setInt(3, region.getDatabaseId());
             ps.executeUpdate();
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Error actualizando región", e);
+            plugin.getLogger().log(Level.SEVERE, "Error actualizando region", e);
         }
         saveFlags(region);
     }
@@ -196,7 +218,7 @@ public class ProtectionDao {
     public CompletableFuture<Void> updateLoreAsync(int regionId, String lore) {
         return CompletableFuture.runAsync(() -> {
             String sql = "UPDATE ap_protections SET custom_lore = ? WHERE id = ?";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, lore);
                 ps.setInt(2, regionId);
@@ -204,7 +226,7 @@ public class ProtectionDao {
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error actualizando lore", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Void> deleteRegionAsync(int regionId) {
@@ -212,7 +234,7 @@ public class ProtectionDao {
             String deleteFlagsSQL = "DELETE FROM ap_protection_flags WHERE protection_id = ?";
             String deleteMembersSQL = "DELETE FROM ap_protection_members WHERE protection_id = ?";
             String deleteRegionSQL = "DELETE FROM ap_protections WHERE id = ?";
-            try (Connection conn = mySQL.getConnection()) {
+            try (Connection conn = getDb().getConnection()) {
                 conn.setAutoCommit(false);
                 try (PreparedStatement psFlags = conn.prepareStatement(deleteFlagsSQL);
                         PreparedStatement psMembers = conn.prepareStatement(deleteMembersSQL);
@@ -231,15 +253,20 @@ public class ProtectionDao {
                     conn.setAutoCommit(true);
                 }
             } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, "Error borrando región", e);
+                plugin.getLogger().log(Level.SEVERE, "Error borrando region", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Void> saveFlagAsync(int regionId, String flagKey, FlagPermissionLevel level) {
         return CompletableFuture.runAsync(() -> {
-            String sql = "REPLACE INTO ap_protection_flags (protection_id, flag_key, flag_value) VALUES (?, ?, ?)";
-            try (Connection conn = mySQL.getConnection();
+            SqlDialect dialect = getDb().getDialect();
+            String sql = dialect.getUpsertSql(
+                    "ap_protection_flags",
+                    new String[]{"protection_id", "flag_key", "flag_value"},
+                    new String[]{"protection_id", "flag_key"}
+            );
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, regionId);
                 ps.setString(2, flagKey);
@@ -248,13 +275,18 @@ public class ProtectionDao {
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error guardando flag", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Void> saveBooleanFlagAsync(int regionId, String flagKey, boolean value) {
         return CompletableFuture.runAsync(() -> {
-            String sql = "REPLACE INTO ap_protection_flags (protection_id, flag_key, flag_value) VALUES (?, ?, ?)";
-            try (Connection conn = mySQL.getConnection();
+            SqlDialect dialect = getDb().getDialect();
+            String sql = dialect.getUpsertSql(
+                    "ap_protection_flags",
+                    new String[]{"protection_id", "flag_key", "flag_value"},
+                    new String[]{"protection_id", "flag_key"}
+            );
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, regionId);
                 ps.setString(2, flagKey);
@@ -263,30 +295,50 @@ public class ProtectionDao {
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error guardando boolean flag", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Void> saveMemberAsync(int regionId, UUID playerUuid, String rank) {
         return CompletableFuture.runAsync(() -> {
-            String sql = "INSERT INTO ap_protection_members (protection_id, player_uuid, rank_level, joined_at) VALUES (?, ?, ?, UNIX_TIMESTAMP() * 1000) "
-                    +
-                    "ON DUPLICATE KEY UPDATE rank_level = VALUES(rank_level)";
-            try (Connection conn = mySQL.getConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, regionId);
-                ps.setString(2, playerUuid.toString());
-                ps.setString(3, rank);
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, "Error guardando miembro", e);
+            SqlDialect dialect = getDb().getDialect();
+            String sql;
+            if (dialect.getTimestampFunction() != null) {
+                sql = "INSERT INTO ap_protection_members (protection_id, player_uuid, rank_level, joined_at) VALUES (?, ?, ?, " + dialect.getTimestampFunction() + ") " +
+                        "ON DUPLICATE KEY UPDATE rank_level = VALUES(rank_level)";
+                try (Connection conn = getDb().getConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, regionId);
+                    ps.setString(2, playerUuid.toString());
+                    ps.setString(3, rank);
+                    ps.executeUpdate();
+                } catch (SQLException e) {
+                    plugin.getLogger().log(Level.SEVERE, "Error guardando miembro", e);
+                }
+            } else {
+                sql = dialect.getUpsertWithUpdateSql(
+                        "ap_protection_members",
+                        new String[]{"protection_id", "player_uuid", "rank_level", "joined_at"},
+                        new String[]{"protection_id", "player_uuid"},
+                        new String[]{"rank_level", "joined_at"}
+                );
+                try (Connection conn = getDb().getConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, regionId);
+                    ps.setString(2, playerUuid.toString());
+                    ps.setString(3, rank);
+                    ps.setLong(4, System.currentTimeMillis());
+                    ps.executeUpdate();
+                } catch (SQLException e) {
+                    plugin.getLogger().log(Level.SEVERE, "Error guardando miembro", e);
+                }
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Void> deleteMemberAsync(int regionId, UUID playerUuid) {
         return CompletableFuture.runAsync(() -> {
             String sql = "DELETE FROM ap_protection_members WHERE protection_id = ? AND player_uuid = ?";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, regionId);
                 ps.setString(2, playerUuid.toString());
@@ -294,7 +346,7 @@ public class ProtectionDao {
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error borrando miembro", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Void> removeMemberAsync(int regionId, UUID playerUuid) {
@@ -304,7 +356,7 @@ public class ProtectionDao {
     public CompletableFuture<Void> saveHologramStateAsync(int regionId, boolean enabled) {
         return CompletableFuture.runAsync(() -> {
             String sql = "UPDATE ap_protections SET hologram_enabled = ? WHERE id = ?";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setBoolean(1, enabled);
                 ps.setInt(2, regionId);
@@ -312,14 +364,14 @@ public class ProtectionDao {
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error guardando estado de holograma", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Integer> savePresetAsync(com.amplan.amplprotections.model.FlagPreset preset) {
         CompletableFuture<Integer> future = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             String sql = "INSERT INTO ap_flag_presets (name, owner_uuid, is_global, flag_data) VALUES (?, ?, ?, ?)";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, preset.getName());
                 ps.setString(2, preset.getOwnerUuid().toString());
@@ -341,21 +393,21 @@ public class ProtectionDao {
                 plugin.getLogger().log(Level.SEVERE, "Error guardando preset", e);
                 future.complete(-1);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
         return future;
     }
 
     public CompletableFuture<Void> deletePresetAsync(int presetId) {
         return CompletableFuture.runAsync(() -> {
             String sql = "DELETE FROM ap_flag_presets WHERE preset_id = ?";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, presetId);
                 ps.executeUpdate();
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error borrando preset", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<List<com.amplan.amplprotections.model.FlagPreset>> loadAllPresetsAsync() {
@@ -363,7 +415,7 @@ public class ProtectionDao {
         CompletableFuture.runAsync(() -> {
             List<com.amplan.amplprotections.model.FlagPreset> presets = new ArrayList<>();
             String sql = "SELECT * FROM ap_flag_presets";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery()) {
 
@@ -404,13 +456,13 @@ public class ProtectionDao {
                 plugin.getLogger().log(Level.SEVERE, "Error cargando presets", e);
                 future.complete(new ArrayList<>());
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
         return future;
     }
 
     public CompletableFuture<Void> saveFlagsAsync(ProtectionRegion region) {
         return CompletableFuture.runAsync(() -> {
-            try (Connection conn = mySQL.getConnection()) {
+            try (Connection conn = getDb().getConnection()) {
                 conn.setAutoCommit(false);
                 try {
                     String deleteSql = "DELETE FROM ap_protection_flags WHERE protection_id = ?";
@@ -446,16 +498,27 @@ public class ProtectionDao {
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error guardando flags", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Void> saveRentalAsync(com.amplan.amplprotections.model.Rental rental) {
         return CompletableFuture.runAsync(() -> {
-            String sql = "INSERT INTO ap_rentals (region_id, renter_uuid, start_time, end_time, price, auto_renew, last_payment, duration_days) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE renter_uuid = VALUES(renter_uuid), start_time = VALUES(start_time), " +
-                    "end_time = VALUES(end_time), price = VALUES(price), auto_renew = VALUES(auto_renew), last_payment = VALUES(last_payment), duration_days = VALUES(duration_days)";
-            try (Connection conn = mySQL.getConnection();
+            SqlDialect dialect = getDb().getDialect();
+            String sql;
+            if (dialect.getTimestampFunction() != null) {
+                sql = "INSERT INTO ap_rentals (region_id, renter_uuid, start_time, end_time, price, auto_renew, last_payment, duration_days) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
+                        "ON DUPLICATE KEY UPDATE renter_uuid = VALUES(renter_uuid), start_time = VALUES(start_time), " +
+                        "end_time = VALUES(end_time), price = VALUES(price), auto_renew = VALUES(auto_renew), last_payment = VALUES(last_payment), duration_days = VALUES(duration_days)";
+            } else {
+                sql = dialect.getUpsertWithUpdateSql(
+                        "ap_rentals",
+                        new String[]{"region_id", "renter_uuid", "start_time", "end_time", "price", "auto_renew", "last_payment", "duration_days"},
+                        new String[]{"region_id", "renter_uuid"},
+                        new String[]{"renter_uuid", "start_time", "end_time", "price", "auto_renew", "last_payment", "duration_days"}
+                );
+            }
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, rental.getRegionId());
                 ps.setString(2, rental.getRenterUuid().toString());
@@ -469,20 +532,20 @@ public class ProtectionDao {
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error guardando rental", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<Void> deleteRentalAsync(int regionId) {
         return CompletableFuture.runAsync(() -> {
             String sql = "DELETE FROM ap_rentals WHERE region_id = ?";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, regionId);
                 ps.executeUpdate();
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error borrando rental", e);
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
     }
 
     public CompletableFuture<List<com.amplan.amplprotections.model.Rental>> loadAllRentalsAsync() {
@@ -490,7 +553,7 @@ public class ProtectionDao {
         CompletableFuture.runAsync(() -> {
             List<com.amplan.amplprotections.model.Rental> rentals = new ArrayList<>();
             String sql = "SELECT * FROM ap_rentals";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -509,7 +572,7 @@ public class ProtectionDao {
                 plugin.getLogger().log(Level.SEVERE, "Error cargando rentals", e);
                 future.complete(new ArrayList<>());
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
         return future;
     }
 
@@ -518,7 +581,7 @@ public class ProtectionDao {
         CompletableFuture.runAsync(() -> {
             List<UUID> players = new ArrayList<>();
             String sql = "SELECT player_uuid FROM ap_block_log WHERE region_id = ? GROUP BY player_uuid ORDER BY MAX(timestamp) DESC";
-            try (Connection conn = mySQL.getConnection();
+            try (Connection conn = getDb().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, regionId);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -534,7 +597,7 @@ public class ProtectionDao {
                 plugin.getLogger().log(Level.SEVERE, "Error obteniendo jugadores con cambios", e);
                 future.complete(new ArrayList<>());
             }
-        }, mySQL.getDbExecutor());
+        }, getDb().getDbExecutor());
         return future;
     }
 
@@ -543,7 +606,7 @@ public class ProtectionDao {
                 +
                 "original_x, original_y, original_z, original_min_x, original_max_x, original_min_z, original_max_z, " +
                 "original_type, original_land_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = mySQL.getConnection();
+        try (Connection conn = getDb().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             for (ProtectionRegion orig : originals) {
                 ps.setInt(1, mergedId);
@@ -571,7 +634,7 @@ public class ProtectionDao {
     public List<ProtectionRegion> getMergeParentsSync(int mergedId) {
         List<ProtectionRegion> parents = new ArrayList<>();
         String sql = "SELECT * FROM ap_protection_merges WHERE merged_id = ?";
-        try (Connection conn = mySQL.getConnection();
+        try (Connection conn = getDb().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, mergedId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -599,7 +662,7 @@ public class ProtectionDao {
 
     public void deleteMergeHistorySync(int mergedId) {
         String sql = "DELETE FROM ap_protection_merges WHERE merged_id = ?";
-        try (Connection conn = mySQL.getConnection();
+        try (Connection conn = getDb().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, mergedId);
             ps.executeUpdate();
@@ -610,7 +673,7 @@ public class ProtectionDao {
 
     public boolean hasMergeHistory(int mergedId) {
         String sql = "SELECT COUNT(*) FROM ap_protection_merges WHERE merged_id = ?";
-        try (Connection conn = mySQL.getConnection();
+        try (Connection conn = getDb().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, mergedId);
             try (ResultSet rs = ps.executeQuery()) {

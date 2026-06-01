@@ -1,13 +1,19 @@
 # Language setting (en, es)
 language: en
-# MySQL database configuration
+
+# Database configuration
+# type: "sqlite" (default, local file) or "mysql" (requires external server)
 database:
-  host: 127.0.0.1
-  port: 3306
-  name: "database_name"
-  username: "username"
-  password: "password"
-  properties: ?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  type: "sqlite"
+  sqlite:
+    file: "data.db"
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    name: "database_name"
+    username: "root"
+    password: ""
+    properties: "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
 
 # General plugin settings
 worlds:

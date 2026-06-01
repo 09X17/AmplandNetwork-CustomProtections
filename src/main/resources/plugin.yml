@@ -1,5 +1,5 @@
 name: AmplProtections
-version: '1.0.10'
+version: '1.0.11'
 main: com.amplan.amplprotections.AmplProtections
 api-version: '1.21'
 description: Advanced protection system with custom blocks, flags, rentals and more.
@@ -17,6 +17,9 @@ commands:
     description: Master command exclusive for staff.
     aliases: [adminprotecciones, adminprot]
     permission: amplprotections.admin.use
+  aprotmigrate:
+    description: Migrate database between SQLite and MySQL.
+    permission: amplprotections.admin
 
 permissions:
   amplprotections.use:

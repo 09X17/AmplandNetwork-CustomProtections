@@ -124,7 +124,7 @@ public class BlockLogger {
 
         String sql = "INSERT INTO ap_block_log (region_id, player_uuid, old_type, new_type, block_data, x, y, z, timestamp, action) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = plugin.getMySQLConnection().getConnection();
+        try (Connection conn = plugin.getDatabaseConnection().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             conn.setAutoCommit(false);
@@ -156,7 +156,7 @@ public class BlockLogger {
         long cutoffTime = System.currentTimeMillis() - (maxAgeDays * 24L * 60L * 60L * 1000L);
         String sql = "DELETE FROM ap_block_log WHERE timestamp < ?";
 
-        try (Connection conn = plugin.getMySQLConnection().getConnection();
+        try (Connection conn = plugin.getDatabaseConnection().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, cutoffTime);
             int deleted = ps.executeUpdate();

@@ -7,9 +7,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.amplan.amplprotections.command.AdminProtectionCommand;
+import com.amplan.amplprotections.command.MigrateCommand;
 import com.amplan.amplprotections.command.ProtectionCommand;
 import com.amplan.amplprotections.config.MenuConfigManager;
-import com.amplan.amplprotections.database.MySQLConnection;
+import com.amplan.amplprotections.database.DatabaseConnection;
+import com.amplan.amplprotections.database.DatabaseFactory;
 import com.amplan.amplprotections.economy.EconomyManager;
 import com.amplan.amplprotections.glow.GlowManager;
 import com.amplan.amplprotections.hologram.HologramManager;
@@ -36,7 +38,7 @@ public final class AmplProtections extends JavaPlugin {
     private File adminMenuFile;
     private FileConfiguration adminMenuConfig;
 
-    private MySQLConnection mySQLConnection;
+    private DatabaseConnection databaseConnection;
     private ProtectionManager protectionManager;
     private MenuManager menuManager;
     private MenuConfigManager menuConfigManager;
@@ -76,14 +78,14 @@ public final class AmplProtections extends JavaPlugin {
         this.hologramManager = new HologramManager(this);
         this.glowManager = new GlowManager(this);
         this.presetManager = new PresetManager(this);
-        this.mySQLConnection = new MySQLConnection(this);
+        this.databaseConnection = DatabaseFactory.createDatabase(this);
 
         getServer().getPluginManager().registerEvents(this.menuManager, this);
         this.chatSearchListener = new ChatSearchListener(this);
         getServer().getPluginManager().registerEvents(this.chatSearchListener, this);
 
-        if (!mySQLConnection.connect()) {
-            getLogger().severe("¡No se pudo establecer conexión con MySQL! Deshabilitando plugin...");
+        if (!databaseConnection.connect()) {
+            getLogger().severe("No se pudo establecer conexion con la base de datos! Deshabilitando plugin...");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -116,6 +118,14 @@ public final class AmplProtections extends JavaPlugin {
         if (aprot != null) {
             aprot.setExecutor(adminCmd);
             aprot.setTabCompleter(adminCmd);
+        }
+
+        MigrateCommand migrateCmd = new MigrateCommand(this);
+
+        var migrate = getCommand("aprotmigrate");
+        if (migrate != null) {
+            migrate.setExecutor(migrateCmd);
+            migrate.setTabCompleter(migrateCmd);
         }
 
         ProtectionCommand protectionCmd = new ProtectionCommand(this);
@@ -154,8 +164,8 @@ public final class AmplProtections extends JavaPlugin {
         if (protectionManager != null) {
             protectionManager.saveAllRegionsSync();
         }
-        if (mySQLConnection != null) {
-            mySQLConnection.disconnect();
+        if (databaseConnection != null) {
+            databaseConnection.disconnect();
         }
     }
 
@@ -225,8 +235,12 @@ public final class AmplProtections extends JavaPlugin {
         return this.languageManager;
     }
 
-    public MySQLConnection getMySQLConnection() {
-        return this.mySQLConnection;
+    public DatabaseConnection getDatabaseConnection() {
+        return this.databaseConnection;
+    }
+
+    public void setDatabaseConnection(DatabaseConnection databaseConnection) {
+        this.databaseConnection = databaseConnection;
     }
 
     public ProtectionManager getProtectionManager() {

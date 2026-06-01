@@ -44,7 +44,7 @@ public class RollbackManager {
             }
             sql += " ORDER BY timestamp DESC";
 
-            try (Connection conn = plugin.getMySQLConnection().getConnection();
+            try (Connection conn = plugin.getDatabaseConnection().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, region.getDatabaseId());
                 ps.setLong(2, sinceTimestamp);
@@ -140,7 +140,7 @@ public class RollbackManager {
             return;
         CompletableFuture.runAsync(() -> {
             String sql = "DELETE FROM ap_block_log WHERE log_id = ?";
-            try (Connection conn = plugin.getMySQLConnection().getConnection();
+            try (Connection conn = plugin.getDatabaseConnection().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 for (int logId : logIds) {
                     ps.setInt(1, logId);
@@ -162,7 +162,7 @@ public class RollbackManager {
                 sql += " AND player_uuid = ?";
             }
 
-            try (Connection conn = plugin.getMySQLConnection().getConnection();
+            try (Connection conn = plugin.getDatabaseConnection().getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, region.getDatabaseId());
                 ps.setLong(2, sinceTimestamp);

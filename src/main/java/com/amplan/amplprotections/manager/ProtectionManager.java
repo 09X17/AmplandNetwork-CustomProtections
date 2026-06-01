@@ -125,6 +125,12 @@ public class ProtectionManager {
         ProtectionRegion.resetCounter(maxId);
     }
 
+    public void clearAllRegions() {
+        worldRegions.clear();
+        idMap.clear();
+        ProtectionRegion.resetCounter(0);
+    }
+
     public ItemStack createProtectionItem(String typeId) {
         ProtectionType type = protectionTypes.get(typeId);
         if (type == null)
@@ -187,7 +193,7 @@ public class ProtectionManager {
     public void saveAllRegionsSync() {
         if (idMap.isEmpty())
             return;
-        try (Connection conn = plugin.getMySQLConnection().getConnection()) {
+        try (Connection conn = plugin.getDatabaseConnection().getConnection()) {
             conn.setAutoCommit(false);
             try {
                 String updateSql = "UPDATE ap_protections SET custom_name = ?, custom_lore = ? WHERE id = ?";
