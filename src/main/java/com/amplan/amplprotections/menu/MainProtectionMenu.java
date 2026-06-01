@@ -169,7 +169,7 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
                         .mapToInt(Integer::intValue)
                         .toArray();
 
-        this.menuTitle = getConfigString(menuConfig, "title", "<dark_gray>Ajustes de Proteccion");
+        this.menuTitle = getConfigString(menuConfig, "title", MessageUtils.lang("menu.main-title"));
         this.inventory = Bukkit.createInventory(null, 54, mm.deserialize(menuTitle));
 
         ConfigurationSection borderCfg = menuConfig.getConfigurationSection("border");
@@ -189,12 +189,12 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.infoEnabled = infoCfg != null ? infoCfg.getBoolean("enabled", true) : true;
         this.infoSlot = infoCfg != null ? infoCfg.getInt("slot", 13) : 13;
         this.infoMaterial = getMaterial(infoCfg, "material", Material.KNOWLEDGE_BOOK);
-        this.infoDisplayName = getConfigString(infoCfg, "display-name", "<gold><b>Informacion</b></gold>");
+        this.infoDisplayName = getConfigString(infoCfg, "display-name", MessageUtils.lang("menu.info-btn"));
         this.infoLore = getConfigList(infoCfg, "lore", Arrays.asList(
-                "<gray>Nombre: <white>%name%",
-                "<gray>Tipo: <white>%type%",
-                "<gray>Tamano: <yellow>%size%",
-                "<gray>Centro: <aqua>X:%x% Y:%y% Z:%z%"));
+                MessageUtils.lang("menu.info-lore-name"),
+                MessageUtils.lang("menu.info-lore-type"),
+                MessageUtils.lang("menu.info-lore-size"),
+                MessageUtils.lang("menu.info-lore-center")));
         this.infoCustomModelData = getCustomModelData(infoCfg, "custom-model-data", -1);
         this.infoSkullValue = getConfigString(infoCfg, "skull-value", null);
 
@@ -204,19 +204,19 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.statusSlotRight = statusCfg != null ? statusCfg.getInt("slot-right", 16) : 16;
         this.statusEnabledMaterial = getMaterial(statusCfg, "enabled-material", Material.LIME_DYE);
         this.statusDisabledMaterial = getMaterial(statusCfg, "disabled-material", Material.RED_DYE);
-        this.statusDisplayName = getConfigString(statusCfg, "display-name", "<white><b>Estado</b></white>");
+        this.statusDisplayName = getConfigString(statusCfg, "display-name", MessageUtils.lang("menu.status-btn"));
         this.statusLore = getConfigList(statusCfg, "lore", Arrays.asList(
-                "<green>Permitidas: <white>%enabled%",
-                "<red>Denegadas: <white>%disabled%"));
+                MessageUtils.lang("menu.status-lore-enabled"),
+                MessageUtils.lang("menu.status-lore-disabled")));
         this.statusCustomModelData = getCustomModelData(statusCfg, "custom-model-data", -1);
 
         ConfigurationSection membersCfg = menuConfig.getConfigurationSection("members-button");
         this.membersEnabled = membersCfg != null ? membersCfg.getBoolean("enabled", true) : true;
         this.membersSlot = membersCfg != null ? membersCfg.getInt("slot", 47) : 47;
         this.membersMaterial = getMaterial(membersCfg, "material", Material.PLAYER_HEAD);
-        this.membersDisplayName = getConfigString(membersCfg, "display-name", "<yellow><b>Miembros</b></yellow>");
+        this.membersDisplayName = getConfigString(membersCfg, "display-name", MessageUtils.lang("menu.members-btn"));
         this.membersLore = getConfigList(membersCfg, "lore", Arrays.asList(
-                "<gray>Actuales: <white>%count%", "", "<green>Clic para gestionar"));
+                MessageUtils.lang("menu.members-lore-current"), "", MessageUtils.lang("menu.members-lore-click")));
         this.membersCustomModelData = getCustomModelData(membersCfg, "custom-model-data", -1);
         this.membersSkullValue = getConfigString(membersCfg, "skull-value", null);
 
@@ -224,8 +224,8 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.closeEnabled = closeCfg != null ? closeCfg.getBoolean("enabled", true) : true;
         this.closeSlot = closeCfg != null ? closeCfg.getInt("slot", 49) : 49;
         this.closeMaterial = getMaterial(closeCfg, "material", Material.BARRIER);
-        this.closeDisplayName = getConfigString(closeCfg, "display-name", "<red><b>Cerrar</b></red>");
-        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList("<gray>Clic para salir"));
+        this.closeDisplayName = getConfigString(closeCfg, "display-name", MessageUtils.lang("menu.close-btn"));
+        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList(MessageUtils.lang("menu.close-lore")));
         this.closeCustomModelData = getCustomModelData(closeCfg, "custom-model-data", -1);
         this.closeSkullValue = getConfigString(closeCfg, "skull-value", null);
 
@@ -233,9 +233,9 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.deleteEnabled = deleteCfg != null ? deleteCfg.getBoolean("enabled", true) : true;
         this.deleteSlot = deleteCfg != null ? deleteCfg.getInt("slot", 51) : 51;
         this.deleteMaterial = getMaterial(deleteCfg, "material", Material.TNT);
-        this.deleteDisplayName = getConfigString(deleteCfg, "display-name", "<red><b>Eliminar</b></red>");
+        this.deleteDisplayName = getConfigString(deleteCfg, "display-name", MessageUtils.lang("menu.delete-btn"));
         this.deleteLore = getConfigList(deleteCfg, "lore", Arrays.asList(
-                "<red>Accion irreversible!", "", "<dark_gray>Shift + Clic para eliminar"));
+                MessageUtils.lang("menu.delete-lore-warning"), "", MessageUtils.lang("menu.delete-lore-shift")));
         this.deleteCustomModelData = getCustomModelData(deleteCfg, "custom-model-data", -1);
         this.deleteSkullValue = getConfigString(deleteCfg, "skull-value", null);
 
@@ -243,9 +243,9 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.viewEnabled = viewCfg != null ? viewCfg.getBoolean("enabled", true) : true;
         this.viewSlot = viewCfg != null ? viewCfg.getInt("slot", 45) : 45;
         this.viewMaterial = getMaterial(viewCfg, "material", Material.COMPASS);
-        this.viewDisplayName = getConfigString(viewCfg, "display-name", "<aqua><b>Ver Limites</b></aqua>");
+        this.viewDisplayName = getConfigString(viewCfg, "display-name", MessageUtils.lang("menu.view-btn"));
         this.viewLore = getConfigList(viewCfg, "lore",
-                Collections.singletonList("<gray>Clic para preview con particulas"));
+                Collections.singletonList(MessageUtils.lang("menu.view-lore")));
         this.viewCustomModelData = getCustomModelData(viewCfg, "custom-model-data", -1);
         this.viewSkullValue = getConfigString(viewCfg, "skull-value", null);
 
@@ -253,25 +253,25 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.prevEnabled = prevCfg != null ? prevCfg.getBoolean("enabled", true) : true;
         this.prevSlot = prevCfg != null ? prevCfg.getInt("slot", 46) : 46;
         this.prevMaterial = getMaterial(prevCfg, "material", Material.ARROW);
-        this.prevDisplayName = getConfigString(prevCfg, "display-name", "<green><b>Anterior</b></green>");
-        this.prevLore = getConfigList(prevCfg, "lore", Collections.singletonList("<gray>Clic para pagina anterior"));
+        this.prevDisplayName = getConfigString(prevCfg, "display-name", MessageUtils.lang("menu.prev-btn"));
+        this.prevLore = getConfigList(prevCfg, "lore", Collections.singletonList(MessageUtils.lang("menu.prev-lore")));
         this.prevCustomModelData = getCustomModelData(prevCfg, "custom-model-data", -1);
 
         ConfigurationSection nextCfg = menuConfig.getConfigurationSection("next-page-button");
         this.nextEnabled = nextCfg != null ? nextCfg.getBoolean("enabled", true) : true;
         this.nextSlot = nextCfg != null ? nextCfg.getInt("slot", 52) : 52;
         this.nextMaterial = getMaterial(nextCfg, "material", Material.ARROW);
-        this.nextDisplayName = getConfigString(nextCfg, "display-name", "<green><b>Siguiente</b></green>");
-        this.nextLore = getConfigList(nextCfg, "lore", Collections.singletonList("<gray>Clic para pagina siguiente"));
+        this.nextDisplayName = getConfigString(nextCfg, "display-name", MessageUtils.lang("menu.next-btn"));
+        this.nextLore = getConfigList(nextCfg, "lore", Collections.singletonList(MessageUtils.lang("menu.next-lore")));
         this.nextCustomModelData = getCustomModelData(nextCfg, "custom-model-data", -1);
 
         ConfigurationSection pageInfoCfg = menuConfig.getConfigurationSection("page-info");
         this.pageInfoEnabled = pageInfoCfg != null ? pageInfoCfg.getBoolean("enabled", true) : true;
         this.pageInfoMaterial = getMaterial(pageInfoCfg, "material", Material.KNOWLEDGE_BOOK);
         this.pageInfoDisplayName = getConfigString(pageInfoCfg, "display-name",
-                "<white>Pagina %current% / %total%</white>");
+                MessageUtils.lang("menu.page-info"));
         this.pageInfoLore = getConfigList(pageInfoCfg, "lore",
-                Collections.singletonList("<gray>Flags: <white>%showing%"));
+                Collections.singletonList(MessageUtils.lang("menu.page-flags-info")));
         this.pageInfoCustomModelData = getCustomModelData(pageInfoCfg, "custom-model-data", -1);
 
         ConfigurationSection holoCfg = menuConfig.getConfigurationSection("hologram-button");
@@ -279,11 +279,11 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.hologramSlot = holoCfg != null ? holoCfg.getInt("slot", 48) : 48;
         this.hologramMaterial = getMaterial(holoCfg, "material", Material.END_CRYSTAL);
         this.hologramCustomModelData = getCustomModelData(holoCfg, "custom-model-data", -1);
-        this.hologramDisplayNameOn = getConfigString(holoCfg, "display-name-on", "<green><b>Holograma: ON</b></green>");
-        this.hologramDisplayNameOff = getConfigString(holoCfg, "display-name-off", "<red><b>Holograma: OFF</b></red>");
+        this.hologramDisplayNameOn = getConfigString(holoCfg, "display-name-on", MessageUtils.lang("menu.hologram-on"));
+        this.hologramDisplayNameOff = getConfigString(holoCfg, "display-name-off", MessageUtils.lang("menu.hologram-off"));
         this.hologramLoreOn = getConfigList(holoCfg, "lore-on",
-                Collections.singletonList("<gray>Clic para desactivar"));
-        this.hologramLoreOff = getConfigList(holoCfg, "lore-off", Collections.singletonList("<gray>Clic para activar"));
+                Collections.singletonList(MessageUtils.lang("menu.hologram-lore-on")));
+        this.hologramLoreOff = getConfigList(holoCfg, "lore-off", Collections.singletonList(MessageUtils.lang("menu.hologram-lore-off")));
         this.hologramSkullValue = getConfigString(holoCfg, "skull-value", null);
 
         ConfigurationSection mergeCfg = menuConfig.getConfigurationSection("merge-button");
@@ -291,9 +291,9 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.mergeSlot = mergeCfg != null ? mergeCfg.getInt("slot", 50) : 50;
         this.mergeMaterial = getMaterial(mergeCfg, "material", Material.ANVIL);
         this.mergeCustomModelData = getCustomModelData(mergeCfg, "custom-model-data", -1);
-        this.mergeDisplayName = getConfigString(mergeCfg, "display-name", "<gold><b>Fusionar</b></gold>");
+        this.mergeDisplayName = getConfigString(mergeCfg, "display-name", MessageUtils.lang("menu.merge-btn"));
         this.mergeLore = getConfigList(mergeCfg, "lore",
-                Collections.singletonList("<gray>Clic para fusionar con otra proteccion"));
+                Collections.singletonList(MessageUtils.lang("menu.merge-lore")));
         this.mergeSkullValue = getConfigString(mergeCfg, "skull-value", null);
 
         ConfigurationSection presetCfg = menuConfig.getConfigurationSection("preset-button");
@@ -301,9 +301,9 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.presetSlot = presetCfg != null ? presetCfg.getInt("slot", 44) : 44;
         this.presetMaterial = getMaterial(presetCfg, "material", Material.BOOK);
         this.presetCustomModelData = getCustomModelData(presetCfg, "custom-model-data", -1);
-        this.presetDisplayName = getConfigString(presetCfg, "display-name", "<aqua><b>Presets</b></aqua>");
+        this.presetDisplayName = getConfigString(presetCfg, "display-name", MessageUtils.lang("menu.preset-btn"));
         this.presetLore = getConfigList(presetCfg, "lore",
-                Collections.singletonList("<gray>Clic para aplicar un preset de flags"));
+                Collections.singletonList(MessageUtils.lang("menu.preset-lore")));
         this.presetSkullValue = getConfigString(presetCfg, "skull-value", null);
 
         buildInventoryContents();
@@ -502,15 +502,15 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
 
             if (isBool) {
                 levelColor = boolEnabled ? "<green>" : "<red>";
-                levelDisplay = boolEnabled ? "<green>ON" : "<red>OFF";
-                levelDesc = boolEnabled ? "<green>Activado" : "<red>Desactivado";
+                levelDisplay = boolEnabled ? MessageUtils.lang("commands.flag-boolean-state-on") : MessageUtils.lang("commands.flag-boolean-state-off");
+                levelDesc = boolEnabled ? MessageUtils.lang("commands.flag-boolean-enabled") : MessageUtils.lang("commands.flag-boolean-disabled");
             } else {
                 levelColor = switch (level) {
-                    case NONE -> "<red>";
-                    case OWNER -> "<gold>";
-                    case MEMBERS -> "<green>";
-                    case ADMINS -> "<yellow>";
-                    case EVERYONE -> "<aqua>";
+                    case NONE -> MessageUtils.lang("flag-levels.none.color");
+                    case OWNER -> MessageUtils.lang("flag-levels.owner.color");
+                    case MEMBERS -> MessageUtils.lang("flag-levels.members.color");
+                    case ADMINS -> MessageUtils.lang("flag-levels.admins.color");
+                    case EVERYONE -> MessageUtils.lang("flag-levels.everyone.color");
                 };
                 levelDisplay = level.getDisplayName();
                 levelDesc = level.getDescription();
@@ -518,26 +518,26 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
 
             if (displayName != null) {
                 meta.displayName(mm.deserialize(displayName
-                        .replace("%flag%", flag.toUpperCase())
+                        .replace("%flag%", MessageUtils.getFlagName(flag))
                         .replace("%state%", levelDisplay)
                         .replace("%level%", levelDisplay)));
             } else {
-                meta.displayName(mm.deserialize(levelColor + "<b>" + flag.toUpperCase()));
+                meta.displayName(mm.deserialize(levelColor + "<b>" + MessageUtils.getFlagName(flag)));
             }
 
             List<net.kyori.adventure.text.Component> lore;
             if (loreLines != null && !loreLines.isEmpty()) {
                 lore = loreLines.stream()
                         .map(line -> mm.deserialize(line
-                                .replace("%flag%", flag.toUpperCase())
+                                .replace("%flag%", MessageUtils.getFlagName(flag))
                                 .replace("%state%", levelDisplay)
                                 .replace("%level%", levelDisplay)
                                 .replace("%description%", levelDesc)))
                         .toList();
             } else {
                 String hint = isBool
-                        ? "<gray>Clic para activar/desactivar"
-                        : "<gray>Clic izq: siguiente | Clic der: anterior";
+                        ? MessageUtils.lang("commands.flag-hint-boolean")
+                        : MessageUtils.lang("commands.flag-hint-cycle");
                 lore = List.of(
                         mm.deserialize("<gray>Estado: " + levelColor + levelDisplay),
                         mm.deserialize(levelDesc),
@@ -816,9 +816,9 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
                 plugin.getProtectionManager().getProtectionDao().saveBooleanFlagAsync(region.getDatabaseId(), flag,
                         newVal);
 
-                String stateMsg = newVal ? "<green>ON" : "<red>OFF";
+                String stateMsg = newVal ? MessageUtils.lang("commands.flag-boolean-state-on") : MessageUtils.lang("commands.flag-boolean-state-off");
                 String flagMsg = MessageUtils.lang("commands.flag-changed")
-                        .replace("%flag%", flag.toUpperCase())
+                        .replace("%flag%", MessageUtils.getFlagName(flag))
                         .replace("%level%", stateMsg)
                         .replace("%mode%", "<gray>(booleana)");
                 player.sendMessage(mm.deserialize(flagMsg));
@@ -836,14 +836,14 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
                 plugin.getProtectionManager().getProtectionDao().saveFlagAsync(region.getDatabaseId(), flag, newLevel);
 
                 String levelMsg = switch (newLevel) {
-                    case NONE -> "<red>Nadie";
-                    case OWNER -> "<gold>Solo dueño";
-                    case MEMBERS -> "<green>Solo miembros";
-                    case ADMINS -> "<yellow>Solo admins+";
-                    case EVERYONE -> "<aqua>Todos";
+                    case NONE -> MessageUtils.lang("flag-levels.none.set-message");
+                    case OWNER -> MessageUtils.lang("flag-levels.owner.set-message");
+                    case MEMBERS -> MessageUtils.lang("flag-levels.members.set-message");
+                    case ADMINS -> MessageUtils.lang("flag-levels.admins.set-message");
+                    case EVERYONE -> MessageUtils.lang("flag-levels.everyone.set-message");
                 };
                 String flagMsg = MessageUtils.lang("commands.flag-changed")
-                        .replace("%flag%", flag.toUpperCase())
+                        .replace("%flag%", MessageUtils.getFlagName(flag))
                         .replace("%level%", levelMsg)
                         .replace("%mode%", "");
                 player.sendMessage(mm.deserialize(flagMsg));

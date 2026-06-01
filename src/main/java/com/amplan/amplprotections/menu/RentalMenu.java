@@ -20,6 +20,7 @@ import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.model.ProtectionRegion;
 import com.amplan.amplprotections.model.Rental;
 import com.amplan.amplprotections.utils.ItemBuilder;
+import com.amplan.amplprotections.utils.MessageUtils;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -49,8 +50,8 @@ public class RentalMenu implements MenuManager.CustomMenu {
         ConfigurationSection menuConfig = config;
 
         this.menuTitle = menuConfig != null
-                ? menuConfig.getString("title", "<gold><b>ALQUILER DE PROTECCION</b></gold>")
-                : "<gold><b>ALQUILER DE PROTECCION</b></gold>";
+                ? menuConfig.getString("title", MessageUtils.lang("rental-menu.title"))
+                : MessageUtils.lang("rental-menu.title");
         this.inventory = Bukkit.createInventory(this, 54, mm.deserialize(menuTitle));
 
         ConfigurationSection borderCfg = menuConfig != null ? menuConfig.getConfigurationSection("border") : null;
@@ -101,11 +102,11 @@ public class RentalMenu implements MenuManager.CustomMenu {
 
         if (rental != null) {
             List<String> lore = new ArrayList<>();
-            lore.add("<gray>Estado: <green>Alquilado");
+            lore.add(MessageUtils.lang("rental-menu.status-rented"));
             lore.add("<gray>Inquilino: <yellow>" + Bukkit.getOfflinePlayer(rental.getRenterUuid()).getName());
             lore.add("<gray>Precio: <yellow>$" + String.format("%.2f", rental.getPrice()));
             lore.add("<gray>Expira: <yellow>" + formatTime(rental.getRemainingSeconds()));
-            lore.add("<gray>Auto-renovacion: " + (rental.isAutoRenew() ? "<green>Sí" : "<red>No"));
+            lore.add(MessageUtils.lang("rental-menu.auto-renew-label").replace("%state%", rental.isAutoRenew() ? MessageUtils.lang("rental-menu.auto-renew-yes") : MessageUtils.lang("rental-menu.auto-renew-no")));
             lore.add("");
             lore.add("<red>Clic para cancelar alquiler");
 
@@ -116,7 +117,7 @@ public class RentalMenu implements MenuManager.CustomMenu {
             inventory.setItem(22, infoItem);
         } else {
             List<String> lore = new ArrayList<>();
-            lore.add("<gray>Estado: <red>Disponible");
+            lore.add(MessageUtils.lang("rental-menu.status-available"));
             lore.add("");
             lore.add("<green>Clic izq: Alquilar");
             lore.add("<yellow>Shift + Clic: Configurar alquiler");
@@ -186,7 +187,7 @@ public class RentalMenu implements MenuManager.CustomMenu {
 
     private String formatTime(long seconds) {
         if (seconds <= 0)
-            return "Expirado";
+            return MessageUtils.lang("time-expired");
         long days = seconds / 86400;
         long hours = (seconds % 86400) / 3600;
         long mins = (seconds % 3600) / 60;

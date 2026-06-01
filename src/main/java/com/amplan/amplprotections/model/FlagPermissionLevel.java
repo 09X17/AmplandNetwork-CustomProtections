@@ -1,28 +1,52 @@
 package com.amplan.amplprotections.model;
 
+import com.amplan.amplprotections.AmplProtections;
+import com.amplan.amplprotections.language.LanguageManager;
+
 public enum FlagPermissionLevel {
 
-    NONE("Nadie", "<red>NADIE", "<red>Ni siquiera el dueño", 0),
-    OWNER("Solo dueño", "<gold>SOLO DUEÑO", "<gold>Solo el dueño puede", 1),
-    MEMBERS("Miembros", "<green>MIEMBROS", "<green>Solo miembros", 2),
-    ADMINS("Admins+", "<yellow>ADMINS+", "<yellow>Solo admins y superiores", 3),
-    EVERYONE("Todos", "<aqua>TODOS", "<aqua>Todos los jugadores", 4);
+    NONE(0),
+    OWNER(1),
+    MEMBERS(2),
+    ADMINS(3),
+    EVERYONE(4);
 
-    private final String label;
-    private final String displayName;
-    private final String description;
     private final int value;
 
-    FlagPermissionLevel(String label, String displayName, String description, int value) {
-        this.label = label;
-        this.displayName = displayName;
-        this.description = description;
+    FlagPermissionLevel(int value) {
         this.value = value;
     }
 
-    public String getLabel() { return label; }
-    public String getDisplayName() { return displayName; }
-    public String getDescription() { return description; }
+    public String getLabel() {
+        return getLangString("display");
+    }
+
+    public String getDisplayName() {
+        return getLangString("display");
+    }
+
+    public String getDescription() {
+        return getLangString("description");
+    }
+
+    public String getColor() {
+        return getLangString("color");
+    }
+
+    public String getSetMessage() {
+        return getLangString("set-message");
+    }
+
+    private String getLangString(String suffix) {
+        LanguageManager langManager = AmplProtections.getInstance().getLanguageManager();
+        if (langManager == null) {
+            return name();
+        }
+        String key = "flag-levels." + name().toLowerCase() + "." + suffix;
+        String val = langManager.getString(key);
+        return val != null ? val : name();
+    }
+
     public int getValue() { return value; }
 
     public FlagPermissionLevel next() {

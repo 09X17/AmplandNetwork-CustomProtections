@@ -81,7 +81,7 @@ public class BlockListener implements Listener {
                 .count();
 
         if (playerProtectionsInWorld >= maxPerWorld) {
-            player.sendMessage(mm.deserialize("<red>Has alcanzado el limite de protecciones en este mundo."));
+            player.sendMessage(mm.deserialize(msg("protection-manager.world-limit-reached")));
             event.setCancelled(true);
             return;
         }

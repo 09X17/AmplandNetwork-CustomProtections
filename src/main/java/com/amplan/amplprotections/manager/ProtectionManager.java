@@ -154,14 +154,14 @@ public class ProtectionManager {
             return;
         ProtectionRegion region = new ProtectionRegion(owner.getUniqueId(), loc, type);
         if (checkCollision(region)) {
-            owner.sendMessage("§c❌ ¡Colisión detectada!");
+            owner.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(MessageUtils.lang("protection-manager.collision-detected")));
             return;
         }
         protectionDao.saveRegionAsync(region).thenRun(() -> {
             worldRegions.computeIfAbsent(region.getWorldName(), k -> new CopyOnWriteArrayList<>()).add(region);
             idMap.put(region.getDatabaseId(), region);
         });
-        owner.sendMessage("§a🛡️ ¡Protección establecida!");
+        owner.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(MessageUtils.lang("protection-manager.protection-established")));
     }
 
     public void deleteRegionAndDrop(ProtectionRegion region, Player player) {

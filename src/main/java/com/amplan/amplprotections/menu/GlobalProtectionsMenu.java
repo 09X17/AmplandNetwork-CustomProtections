@@ -24,6 +24,7 @@ import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.manager.ProtectionManager;
 import com.amplan.amplprotections.model.ProtectionRegion;
 import com.amplan.amplprotections.utils.ItemBuilder;
+import com.amplan.amplprotections.utils.MessageUtils;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -97,7 +98,7 @@ public class GlobalProtectionsMenu implements MenuManager.CustomMenu {
 
         org.bukkit.configuration.file.FileConfiguration menuConfig = plugin.getMenuConfigManager().getGlobalMenu();
 
-        String defaultTitle = isAdminMode ? "<red>Panel Admin: Todas las Zonas" : "<dark_gray>Mis Protecciones Activas";
+        String defaultTitle = isAdminMode ? MessageUtils.lang("global-menu.title-admin") : MessageUtils.lang("global-menu.title-player");
         this.menuTitle = getConfigString(menuConfig, isAdminMode ? "title-admin" : "title-player", defaultTitle);
         this.inventory = Bukkit.createInventory(this, 54, mm.deserialize(menuTitle));
 
@@ -108,29 +109,29 @@ public class GlobalProtectionsMenu implements MenuManager.CustomMenu {
 
         ConfigurationSection statsCfg = menuConfig != null ? menuConfig.getConfigurationSection("stats-item") : null;
         this.statsMaterial = getMaterial(statsCfg, "material", Material.BEACON);
-        this.statsDisplayName = getConfigString(statsCfg, "display-name", "<gold><b>Estadisticas</b></gold>");
+        this.statsDisplayName = getConfigString(statsCfg, "display-name", MessageUtils.lang("global-menu.stats-btn"));
         this.statsLore = getConfigList(statsCfg, "lore", Arrays.asList(
-                "<gray>Total del servidor: <white>%total%",
-                "<gray>Tus protecciones: <white>%player%",
+                MessageUtils.lang("global-menu.stats-lore-total"),
                 "",
-                isAdminMode ? "<red>Modo Administrador" : "<green>Modo Jugador"));
+                MessageUtils.lang("global-menu.stats-lore-yours"),
+                isAdminMode ? MessageUtils.lang("global-menu.stats-lore-mode-admin") : MessageUtils.lang("global-menu.stats-lore-mode-player")));
         this.statsCustomModelData = getCustomModelData(statsCfg, "custom-model-data", -1);
 
         ConfigurationSection emptyCfg = menuConfig != null ? menuConfig.getConfigurationSection("empty-item") : null;
         this.emptyMaterial = getMaterial(emptyCfg, "material", Material.BARRIER);
-        this.emptyDisplayName = getConfigString(emptyCfg, "display-name", "<red><b>Sin Protecciones</b></red>");
+        this.emptyDisplayName = getConfigString(emptyCfg, "display-name", MessageUtils.lang("global-menu.empty-btn"));
         this.emptyLore = getConfigList(emptyCfg, "lore", Arrays.asList(
-                "<gray>No hay terrenos registrados.",
+                MessageUtils.lang("global-menu.empty-lore-1"),
                 "",
-                "<yellow>Coloca un bloque de proteccion",
-                "<yellow>para crear una zona"));
+                MessageUtils.lang("global-menu.empty-lore-2"),
+                MessageUtils.lang("global-menu.empty-lore-3")));
         this.emptyCustomModelData = getCustomModelData(emptyCfg, "custom-model-data", -1);
 
         ConfigurationSection closeCfg = menuConfig != null ? menuConfig.getConfigurationSection("close-button") : null;
         this.closeSlot = closeCfg != null ? closeCfg.getInt("slot", 49) : 49;
         this.closeMaterial = getMaterial(closeCfg, "material", Material.BARRIER);
-        this.closeDisplayName = getConfigString(closeCfg, "display-name", "<red><b>Cerrar</b></red>");
-        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList("<gray>Clic para salir"));
+        this.closeDisplayName = getConfigString(closeCfg, "display-name", MessageUtils.lang("menu.close-btn"));
+        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList(MessageUtils.lang("menu.close-lore")));
         this.closeCustomModelData = getCustomModelData(closeCfg, "custom-model-data", -1);
 
         ConfigurationSection refreshCfg = menuConfig != null ? menuConfig.getConfigurationSection("refresh-button")
@@ -228,7 +229,7 @@ public class GlobalProtectionsMenu implements MenuManager.CustomMenu {
             processedLore.add(line
                     .replace("%total%", String.valueOf(totalRegions))
                     .replace("%player%", String.valueOf(playerRegions))
-                    .replace("%mode%", isAdminMode ? "<red>Modo Administrador" : "<green>Modo Jugador"));
+                    .replace("%mode%", isAdminMode ? MessageUtils.lang("global-menu.mode-admin") : MessageUtils.lang("global-menu.mode-player")));
         }
 
         ItemStack statsItem = new ItemBuilder(statsMaterial)

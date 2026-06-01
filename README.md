@@ -100,3 +100,4 @@ AmplProtections lets players claim and protect areas in the world using placeabl
 | `/aprot give <player> <type>` | Give protection item | `amplprotections.admin.use` |
 | `/aprot list` | Admin protection browser | `amplprotections.admin.use` |
 | `/aprot reload` | Reload configuration | `amplprotections.admin.use` |
+

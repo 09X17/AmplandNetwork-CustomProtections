@@ -1,12 +1,14 @@
 package com.amplan.amplprotections.menu;
 
-import com.amplan.amplprotections.AmplProtections;
-import com.amplan.amplprotections.model.FlagPreset;
-import com.amplan.amplprotections.model.ProtectionRegion;
-import com.amplan.amplprotections.utils.ItemBuilder;
-import com.amplan.amplprotections.utils.MessageUtils;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,7 +19,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import com.amplan.amplprotections.AmplProtections;
+import com.amplan.amplprotections.model.FlagPreset;
+import com.amplan.amplprotections.model.ProtectionRegion;
+import com.amplan.amplprotections.utils.ItemBuilder;
+import com.amplan.amplprotections.utils.MessageUtils;
+
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class PresetMenu implements MenuManager.CustomMenu {
 
@@ -48,6 +56,7 @@ public class PresetMenu implements MenuManager.CustomMenu {
     private final List<String> closeLore;
     private final int closeCustomModelData;
 
+    @SuppressWarnings("ThisEscapedInObjectConstruction")
     public PresetMenu(AmplProtections plugin, ProtectionRegion region, Player viewer) {
         this.plugin = plugin;
         this.region = region;
@@ -56,7 +65,8 @@ public class PresetMenu implements MenuManager.CustomMenu {
         FileConfiguration config = plugin.getMenuConfigManager().getPresetMenu();
         ConfigurationSection menuConfig = config;
 
-        this.menuTitle = menuConfig != null ? menuConfig.getString("title", "<gold><b>PRESETS DE FLAGS</b></gold>") : "<gold><b>PRESETS DE FLAGS</b></gold>";
+        this.menuTitle = menuConfig != null ? menuConfig.getString("title", MessageUtils.lang("preset-menu.title"))
+                : MessageUtils.lang("preset-menu.title");
         this.inventory = Bukkit.createInventory(this, 54, mm.deserialize(menuTitle));
 
         ConfigurationSection borderCfg = menuConfig != null ? menuConfig.getConfigurationSection("border") : null;
@@ -69,16 +79,16 @@ public class PresetMenu implements MenuManager.CustomMenu {
         this.itemCustomModelData = getCustomModelData(itemCfg, "custom-model-data", -1);
         this.itemDisplayName = getConfigString(itemCfg, "display-name", "<gold><b>%name%</b></gold>");
         this.itemLore = getConfigList(itemCfg, "lore", Arrays.asList(
-                "<gray>%description%",
+                MessageUtils.lang("preset-menu.item-lore-description"),
                 "",
-                "<green>Clic para aplicar preset"
-        ));
+                MessageUtils.lang("preset-menu.item-lore-click")));
 
         ConfigurationSection closeCfg = menuConfig != null ? menuConfig.getConfigurationSection("close-button") : null;
         this.closeSlot = closeCfg != null ? closeCfg.getInt("slot", 49) : 49;
         this.closeMaterial = getMaterial(closeCfg, "material", Material.BARRIER);
-        this.closeDisplayName = getConfigString(closeCfg, "display-name", "<red><b>Cerrar</b></red>");
-        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList("<gray>Clic para salir"));
+        this.closeDisplayName = getConfigString(closeCfg, "display-name", MessageUtils.lang("menu.close-btn"));
+        this.closeLore = getConfigList(closeCfg, "lore",
+                Collections.singletonList(MessageUtils.lang("menu.close-lore")));
         this.closeCustomModelData = getCustomModelData(closeCfg, "custom-model-data", -1);
 
         buildInventoryContents();
@@ -103,8 +113,10 @@ public class PresetMenu implements MenuManager.CustomMenu {
                 border.setItemMeta(meta);
             }
         }
-        for (int i = 0; i < 9; i++) inventory.setItem(i, border);
-        for (int i = 45; i < 54; i++) inventory.setItem(i, border);
+        for (int i = 0; i < 9; i++)
+            inventory.setItem(i, border);
+        for (int i = 45; i < 54; i++)
+            inventory.setItem(i, border);
         for (int row = 1; row <= 4; row++) {
             inventory.setItem(row * 9, border);
             inventory.setItem(row * 9 + 8, border);
@@ -116,7 +128,8 @@ public class PresetMenu implements MenuManager.CustomMenu {
         int slotIndex = 0;
 
         for (FlagPreset preset : presets) {
-            if (slotIndex >= ITEM_SLOTS.length) break;
+            if (slotIndex >= ITEM_SLOTS.length)
+                break;
 
             int slot = ITEM_SLOTS[slotIndex];
             String displayName = preset.isGlobal() ? preset.getName().toUpperCase() : preset.getName();
@@ -131,7 +144,7 @@ public class PresetMenu implements MenuManager.CustomMenu {
 
             ItemStack item = new ItemBuilder(itemMaterial)
                     .setDisplayName(itemDisplayName.replace("%name%", displayName))
-                    .setLore(processedLore.toArray(new String[0]))
+                    .setLore(processedLore.toArray(String[]::new))
                     .build();
 
             if (itemCustomModelData != -1) {
@@ -151,7 +164,7 @@ public class PresetMenu implements MenuManager.CustomMenu {
     private void buildFooter() {
         ItemStack closeBtn = new ItemBuilder(closeMaterial)
                 .setDisplayName(closeDisplayName)
-                .setLore(closeLore.toArray(new String[0]))
+                .setLore(closeLore.toArray(String[]::new))
                 .build();
         if (closeCustomModelData != -1) {
             ItemMeta meta = closeBtn.getItemMeta();
@@ -166,14 +179,18 @@ public class PresetMenu implements MenuManager.CustomMenu {
     @Override
     public void handleMenuClick(int slot, Player player) {
         if (slot == closeSlot) {
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            Location loc = player.getLocation();
+            if (loc == null) return;
+            player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
             player.closeInventory();
             return;
         }
 
         if (slotToPreset.containsKey(slot)) {
             FlagPreset preset = slotToPreset.get(slot);
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+            Location loc = player.getLocation();
+            if (loc == null) return;
+            player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
             player.closeInventory();
 
             preset.applyToRegion(region);
@@ -194,10 +211,16 @@ public class PresetMenu implements MenuManager.CustomMenu {
     }
 
     private Material getMaterial(ConfigurationSection section, String path, Material def) {
-        if (section == null) return def;
+        if (section == null)
+            return def;
         String matName = section.getString(path);
-        if (matName == null) return def;
-        try { return Material.valueOf(matName); } catch (IllegalArgumentException e) { return def; }
+        if (matName == null)
+            return def;
+        try {
+            return Material.valueOf(matName);
+        } catch (IllegalArgumentException e) {
+            return def;
+        }
     }
 
     private List<String> getConfigList(ConfigurationSection section, String path, List<String> def) {

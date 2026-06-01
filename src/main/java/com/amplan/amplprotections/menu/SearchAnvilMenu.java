@@ -25,8 +25,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.amplan.amplprotections.AmplProtections;
+import com.amplan.amplprotections.utils.MessageUtils;
 
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -52,7 +52,7 @@ public class SearchAnvilMenu implements Listener {
         FileConfiguration config = plugin.getAdminMenuConfig();
         ConfigurationSection searchMenuCfg = config.getConfigurationSection("search-menu");
 
-        this.title = getConfigString(searchMenuCfg, "title", "<dark_gray>Buscar Jugador");
+        this.title = getConfigString(searchMenuCfg, "title", MessageUtils.lang("search-anvil.title"));
         this.defaultText = getConfigString(searchMenuCfg, "default-text", "Escribe el nombre...");
         this.emptySearchMsg = getConfigString(searchMenuCfg, "empty-search-msg",
                 "<red>Escribe un nombre de jugador valido.");
@@ -65,7 +65,7 @@ public class SearchAnvilMenu implements Listener {
         ItemStack nameTag = new ItemStack(Material.NAME_TAG);
         ItemMeta meta = nameTag.getItemMeta();
         if (meta != null) {
-            meta.displayName(mm.deserialize("<gray><i>" + defaultText));
+            meta.displayName(mm.deserialize(MessageUtils.lang("search-anvil.name-tag").replace("%name%", defaultText)));
             nameTag.setItemMeta(meta);
         }
         anvilInventory.setItem(0, nameTag);
@@ -73,11 +73,10 @@ public class SearchAnvilMenu implements Listener {
         ItemStack barrier = new ItemStack(Material.BARRIER);
         ItemMeta bMeta = barrier.getItemMeta();
         if (bMeta != null) {
-            bMeta.displayName(mm.deserialize("<red><b>Clic para buscar</b>"));
-            List<Component> lore = new ArrayList<>();
-            lore.add(Component.empty());
-            lore.add(mm.deserialize("<gray>Coloca el nombre del jugador"));
-            lore.add(mm.deserialize("<gray>en la ranura izquierda"));
+            bMeta.displayName(mm.deserialize(MessageUtils.lang("search-anvil.barrier-btn")));
+            List<net.kyori.adventure.text.Component> lore = new ArrayList<>();
+            lore.add(mm.deserialize(MessageUtils.lang("search-anvil.barrier-lore-1")));
+            lore.add(mm.deserialize(MessageUtils.lang("search-anvil.barrier-lore-2")));
             bMeta.lore(lore);
             barrier.setItemMeta(bMeta);
         }
@@ -206,7 +205,7 @@ public class SearchAnvilMenu implements Listener {
                         ItemStack nameTag = new ItemStack(Material.NAME_TAG);
                         ItemMeta meta = nameTag.getItemMeta();
                         if (meta != null) {
-                            meta.displayName(mm.deserialize("<gray><i>" + cursorName));
+                            meta.displayName(mm.deserialize(MessageUtils.lang("search-anvil.name-tag").replace("%name%", cursorName)));
                             nameTag.setItemMeta(meta);
                         }
                         top.setItem(0, nameTag);

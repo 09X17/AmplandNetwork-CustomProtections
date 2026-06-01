@@ -84,7 +84,7 @@ public class EntityListener implements Listener {
         if (region != null && !region.canPlayerAct("pvp", attacker.getUniqueId())) {
             if (!attacker.hasPermission("amplprotections.admin.bypass")) {
                 sendAccessDenied(attacker, "pvp",
-                        "<red> El PvP se encuentra deshabilitado en esta zona de protección.");
+                        MessageUtils.lang("entity-listener.pvp-disabled"));
                 event.setCancelled(true);
             }
         }
@@ -165,7 +165,7 @@ public class EntityListener implements Listener {
         ProtectionRegion region = manager.getRegionAt(event.getEntity().getLocation());
         if (region != null && !region.canPlayerAct("entity-damage", attacker.getUniqueId())) {
             if (!attacker.hasPermission("amplprotections.admin.bypass")) {
-                sendAccessDenied(attacker, "entity-damage", "<red>❌ No puedes dañar entidades aquí.");
+                sendAccessDenied(attacker, "entity-damage", MessageUtils.lang("entity-listener.entity-damage-denied"));
                 event.setCancelled(true);
             }
         }

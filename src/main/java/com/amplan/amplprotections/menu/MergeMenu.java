@@ -24,6 +24,7 @@ import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.manager.ProtectionManager;
 import com.amplan.amplprotections.model.ProtectionRegion;
 import com.amplan.amplprotections.utils.ItemBuilder;
+import com.amplan.amplprotections.utils.MessageUtils;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -64,8 +65,8 @@ public class MergeMenu implements MenuManager.CustomMenu {
         FileConfiguration config = plugin.getMenuConfigManager().getMergeMenu();
         ConfigurationSection menuConfig = config;
 
-        this.menuTitle = menuConfig != null ? menuConfig.getString("title", "<gold><b>FUSIONAR PROTECCIONES</b></gold>")
-                : "<gold><b>FUSIONAR PROTECCIONES</b></gold>";
+        this.menuTitle = menuConfig != null ? menuConfig.getString("title", MessageUtils.lang("merge-menu.title"))
+                : MessageUtils.lang("merge-menu.title");
         this.inventory = Bukkit.createInventory(this, 54, mm.deserialize(menuTitle));
 
         ConfigurationSection borderCfg = menuConfig != null ? menuConfig.getConfigurationSection("border") : null;
@@ -78,11 +79,11 @@ public class MergeMenu implements MenuManager.CustomMenu {
         this.itemCustomModelData = getCustomModelData(itemCfg, "custom-model-data", -1);
         this.itemDisplayName = getConfigString(itemCfg, "display-name", "<gold><b>%name%</b></gold>");
         this.itemLore = getConfigList(itemCfg, "lore", Arrays.asList(
-                "<gray>ID: <yellow>%land_id%",
-                "<gray>Centro: <aqua>%x%, %y%, %z%",
-                "<gray>Tamano: <yellow>%size%",
+                MessageUtils.lang("merge-menu.item-lore-id"),
+                MessageUtils.lang("merge-menu.item-lore-center"),
+                MessageUtils.lang("merge-menu.item-lore-size"),
                 "",
-                "<green>Clic para seleccionar"));
+                MessageUtils.lang("merge-menu.item-lore-click")));
 
         buildInventoryContents();
     }
@@ -136,7 +137,7 @@ public class MergeMenu implements MenuManager.CustomMenu {
             boolean isSelected = selectedSlots.contains(slot);
 
             Material displayMaterial = isSelected ? Material.LIME_DYE : itemMaterial;
-            String statusLine = isSelected ? "<green>✓ Seleccionada" : "<gray>Clic para seleccionar";
+            String statusLine = isSelected ? MessageUtils.lang("merge-menu.item-selected") : MessageUtils.lang("merge-menu.item-not-selected");
 
             List<String> processedLore = new ArrayList<>();
             for (String line : itemLore) {
@@ -213,14 +214,14 @@ public class MergeMenu implements MenuManager.CustomMenu {
 
     private void buildFooter() {
         ItemStack closeBtn = new ItemBuilder(Material.BARRIER)
-                .setDisplayName("<red><b>Cerrar</b></red>")
+                .setDisplayName(MessageUtils.lang("merge-menu.close-btn"))
                 .setLore("<gray>Clic para salir")
                 .build();
         inventory.setItem(CLOSE_SLOT, closeBtn);
 
         ItemStack selectAllBtn = new ItemBuilder(Material.CHEST)
-                .setDisplayName("<aqua><b>Seleccionar Todo</b></aqua>")
-                .setLore("<gray>Clic para seleccionar todas")
+                .setDisplayName(MessageUtils.lang("merge-menu.select-all-btn"))
+                .setLore(MessageUtils.lang("merge-menu.select-all-lore"))
                 .build();
         inventory.setItem(SELECT_ALL_SLOT, selectAllBtn);
 

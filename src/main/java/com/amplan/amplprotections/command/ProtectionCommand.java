@@ -418,7 +418,7 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
     private void handleListProtections(Player player) {
         List<ProtectionRegion> regions = manager.getRegionsByOwner(player.getUniqueId());
         if (regions.isEmpty()) {
-            player.sendMessage(mm.deserialize("<red>✘ No tienes protecciones colocadas."));
+            player.sendMessage(mm.deserialize(MessageUtils.lang("commands.list-no-protections")));
             return;
         }
         Location loc = player.getLocation();
@@ -505,7 +505,7 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                 manager.getProtectionDao().saveFlagsAsync(region);
                 String msg = msg("preset.applied");
                 player.sendMessage(mm.deserialize(
-                        (msg.isEmpty() ? "<green>✔ Preset aplicado." : msg).replace("%preset%", presetName)));
+                        (msg.isEmpty() ? msg("preset.applied") : msg).replace("%preset%", presetName)));
             }
             case "create", "crear" -> {
                 if (args.length < 3) {
@@ -528,11 +528,11 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                 if (created) {
                     String msg = msg("preset.create-success");
                     player.sendMessage(mm.deserialize(
-                            (msg.isEmpty() ? "<green>✔ Preset creado." : msg).replace("%name%", presetName)));
+                            (msg.isEmpty() ? msg("preset.create-success") : msg).replace("%name%", presetName)));
                 } else {
                     String msg = msg("preset.create-exists");
                     player.sendMessage(
-                            mm.deserialize((msg.isEmpty() ? "<red>✘ Ya existe un preset con ese nombre." : msg)));
+                            mm.deserialize((msg.isEmpty() ? msg("preset.create-exists") : msg)));
                 }
             }
             case "delete", "eliminar" -> {
@@ -545,12 +545,12 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                 if (deleted) {
                     String msg = msg("preset.delete-success");
                     player.sendMessage(mm.deserialize(
-                            (msg.isEmpty() ? "<green>✔ Preset eliminado." : msg).replace("%name%", presetName)));
+                            (msg.isEmpty() ? msg("preset.delete-success") : msg).replace("%name%", presetName)));
                 } else {
                     player.sendMessage(mm.deserialize(msg("preset.not-found")));
                 }
             }
-            default -> player.sendMessage(mm.deserialize("<red>✘ Subcomando no valido. Usa: apply, create, delete"));
+            default -> player.sendMessage(mm.deserialize(MessageUtils.lang("commands.preset-invalid-sub")));
         }
     }
 
@@ -617,7 +617,7 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                     return;
                 }
                 if (args.length < 4) {
-                    player.sendMessage(mm.deserialize("<red>✘ Uso: /p rent set <precio> <dias>"));
+                    player.sendMessage(mm.deserialize(msg("commands.rent-usage-set")));
                     return;
                 }
                 try {
@@ -626,12 +626,12 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                     int maxDays = plugin.getConfig().getInt("rental.max-rental-days", 30);
                     if (days > maxDays) {
                         player.sendMessage(
-                                mm.deserialize("<red>✘ El maximo de dias es <yellow>" + maxDays + "</yellow>."));
+                                mm.deserialize(msg("commands.rent-max-days").replace("%max%", String.valueOf(maxDays))));
                         return;
                     }
                     plugin.getRentalManager().setRental(region, price, days, player);
                 } catch (NumberFormatException e) {
-                    player.sendMessage(mm.deserialize("<red>✘ Precio y dias deben ser numeros validos."));
+                    player.sendMessage(mm.deserialize(msg("commands.rent-invalid-numbers")));
                 }
             }
             case "cancel", "cancelar" -> {
@@ -640,20 +640,20 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
             case "info", "informacion" -> {
                 com.amplan.amplprotections.model.Rental rental = plugin.getRentalManager().getRental(region);
                 if (rental != null) {
-                    player.sendMessage(mm.deserialize("<green><b>=== Informacion del Alquiler ===</b></green>"));
-                    player.sendMessage(mm.deserialize(
-                            "<gray>Inquilino: <yellow>" + Bukkit.getOfflinePlayer(rental.getRenterUuid()).getName()));
-                    player.sendMessage(
-                            mm.deserialize("<gray>Precio: <yellow>$" + String.format("%.2f", rental.getPrice())));
-                    player.sendMessage(
-                            mm.deserialize("<gray>Expira en: <yellow>" + formatTime(rental.getRemainingSeconds())));
-                    player.sendMessage(mm
-                            .deserialize("<gray>Auto-renovacion: " + (rental.isAutoRenew() ? "<green>Sí" : "<red>No")));
+                    player.sendMessage(mm.deserialize(msg("commands.rent-info-title")));
+                    player.sendMessage(mm.deserialize(msg("commands.rent-info-renter")
+                            .replace("%renter%", Bukkit.getOfflinePlayer(rental.getRenterUuid()).getName())));
+                    player.sendMessage(mm.deserialize(msg("commands.rent-info-price")
+                            .replace("%price%", String.format("%.2f", rental.getPrice()))));
+                    player.sendMessage(mm.deserialize(msg("commands.rent-info-days")
+                            .replace("%days%", formatTime(rental.getRemainingSeconds()))));
+                    player.sendMessage(mm.deserialize(msg("commands.rent-info-auto-renew")
+                            .replace("%auto%", rental.isAutoRenew() ? msg("commands.yes") : msg("commands.no"))));
                 } else {
-                    player.sendMessage(mm.deserialize("<red>✘ No hay alquiler activo en esta proteccion."));
+                    player.sendMessage(mm.deserialize(msg("commands.rent-no-active")));
                 }
             }
-            default -> player.sendMessage(mm.deserialize("<red>✘ Subcomando no valido. Usa: set, cancel, info"));
+            default -> player.sendMessage(mm.deserialize(msg("commands.rent-invalid-sub")));
         }
     }
 
@@ -680,7 +680,7 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
         switch (subCmd) {
             case "player", "jugador" -> {
                 if (args.length < 4) {
-                    player.sendMessage(mm.deserialize("<red>✘ Uso: /p rollback player <jugador> <minutos>"));
+                    player.sendMessage(mm.deserialize(msg("commands.rollback-usage-player")));
                     return;
                 }
                 org.bukkit.OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
@@ -689,12 +689,12 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                     long since = System.currentTimeMillis() - (minutes * 60L * 1000L);
                     plugin.getRollbackManager().executeRollback(region, target.getUniqueId(), since, player);
                 } catch (NumberFormatException e) {
-                    player.sendMessage(mm.deserialize("<red>✘ Los minutos deben ser un numero valido."));
+                    player.sendMessage(mm.deserialize(msg("commands.rollback-invalid-minutes")));
                 }
             }
             case "all", "todo" -> {
                 if (args.length < 3) {
-                    player.sendMessage(mm.deserialize("<red>✘ Uso: /p rollback all <minutos>"));
+                    player.sendMessage(mm.deserialize(msg("commands.rollback-usage-all")));
                     return;
                 }
                 try {
@@ -702,40 +702,44 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                     long since = System.currentTimeMillis() - (minutes * 60L * 1000L);
                     plugin.getRollbackManager().executeRollback(region, null, since, player);
                 } catch (NumberFormatException e) {
-                    player.sendMessage(mm.deserialize("<red>✘ Los minutos deben ser un numero valido."));
+                    player.sendMessage(mm.deserialize(msg("commands.rollback-invalid-minutes")));
                 }
             }
             case "preview", "vista" -> {
                 if (args.length < 3) {
-                    player.sendMessage(mm.deserialize("<red>✘ Uso: /p rollback preview <minutos>"));
+                    player.sendMessage(mm.deserialize(msg("commands.rollback-usage-preview")));
                     return;
                 }
                 try {
                     int minutes = Integer.parseInt(args[2]);
                     long since = System.currentTimeMillis() - (minutes * 60L * 1000L);
                     plugin.getRollbackManager().getChangeCount(region, null, since).thenAccept(count -> {
-                        player.sendMessage(mm.deserialize("<green>Hay <yellow>" + count
-                                + "</yellow> cambios en los ultimos <yellow>" + minutes + "</yellow> minutos."));
+                        player.sendMessage(mm.deserialize(msg("commands.rollback-preview-count")
+                                .replace("%count%", String.valueOf(count))
+                                .replace("%minutes%", String.valueOf(minutes))));
                     });
                 } catch (NumberFormatException e) {
-                    player.sendMessage(mm.deserialize("<red>✘ Los minutos deben ser un numero valido."));
+                    player.sendMessage(mm.deserialize(msg("commands.rollback-invalid-minutes")));
                 }
             }
-            default -> player.sendMessage(mm.deserialize("<red>✘ Subcomando no valido. Usa: player, all, preview"));
+            default -> player.sendMessage(mm.deserialize(msg("commands.rollback-invalid-sub")));
         }
     }
 
     private String formatTime(long seconds) {
         if (seconds <= 0)
-            return "Expirado";
+            return MessageUtils.lang("time-expired");
         long days = seconds / 86400;
         long hours = (seconds % 86400) / 3600;
         long mins = (seconds % 3600) / 60;
+        String dSuffix = MessageUtils.lang("time-days");
+        String hSuffix = MessageUtils.lang("time-hours");
+        String mSuffix = MessageUtils.lang("time-minutes");
         if (days > 0)
-            return days + "d " + hours + "h";
+            return days + dSuffix + " " + hours + hSuffix;
         if (hours > 0)
-            return hours + "h " + mins + "m";
-        return mins + "m";
+            return hours + hSuffix + " " + mins + mSuffix;
+        return mins + mSuffix;
     }
 
     private void handleFlagChange(Player player, ProtectionRegion region, String[] args) {
@@ -760,7 +764,7 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
         if (flagsMenu != null) {
             org.bukkit.configuration.ConfigurationSection flagSection = flagsMenu.getConfigurationSection(flag);
             if (flagSection != null && !flagSection.getBoolean("enabled", true)) {
-                player.sendMessage(mm.deserialize("<red>Esta flag esta deshabilitada por el administrador."));
+                player.sendMessage(mm.deserialize(msg("commands.flag-disabled-by-admin")));
                 return;
             }
         }
@@ -774,15 +778,15 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                 case "true", "on", "1" -> boolValue = true;
                 case "false", "off", "0" -> boolValue = false;
                 default -> {
-                    player.sendMessage(mm.deserialize("<red>✘ Valor inválido. Usa: true/false, on/off, 1/0"));
+                    player.sendMessage(mm.deserialize(msg("commands.flag-invalid-value")));
                     return;
                 }
             }
             region.setBooleanFlag(flag, boolValue);
             plugin.getProtectionManager().getProtectionDao().saveBooleanFlagAsync(region.getDatabaseId(), flag, boolValue);
-            String stateMsg = boolValue ? "<green>ON" : "<red>OFF";
+            String stateMsg = boolValue ? msg("commands.flag-boolean-state-on") : msg("commands.flag-boolean-state-off");
             player.sendMessage(mm.deserialize(msg("commands.flag-updated")
-                    .replace("%flag%", flag.toUpperCase())
+                    .replace("%flag%", MessageUtils.getFlagName(flag))
                     .replace("%value%", stateMsg)));
         } else {
             String input = args[2].toLowerCase();
@@ -796,9 +800,16 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
 
             region.setFlagLevel(flag, level);
             plugin.getProtectionManager().getProtectionDao().saveFlagAsync(region.getDatabaseId(), flag, level);
+            String levelDisplay = switch (level) {
+                case NONE -> MessageUtils.lang("flag-levels.none.display");
+                case OWNER -> MessageUtils.lang("flag-levels.owner.display");
+                case MEMBERS -> MessageUtils.lang("flag-levels.members.display");
+                case ADMINS -> MessageUtils.lang("flag-levels.admins.display");
+                case EVERYONE -> MessageUtils.lang("flag-levels.everyone.display");
+            };
             player.sendMessage(mm.deserialize(msg("commands.flag-updated")
-                    .replace("%flag%", flag.toUpperCase())
-                    .replace("%value%", level.getDisplayName())));
+                    .replace("%flag%", MessageUtils.getFlagName(flag))
+                    .replace("%value%", levelDisplay)));
         }
     }
 
@@ -813,11 +824,11 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
 
     private void handleDebug(Player player, ProtectionRegion region, String[] args) {
         if (!player.hasPermission("amplprotections.admin.bypass") && !player.isOp()) {
-            player.sendMessage(mm.deserialize("<red>❌ No tienes permiso para usar este comando."));
+            player.sendMessage(mm.deserialize(msg("commands.debug-no-permission")));
             return;
         }
 
-        player.sendMessage(mm.deserialize("<gold><b>=== Debug de AmplProtections ===</b></gold>"));
+        player.sendMessage(mm.deserialize(msg("commands.debug-title")));
 
         player.sendMessage(mm.deserialize("<gray>Player: <white>" + player.getName()));
         player.sendMessage(mm.deserialize("<gray>UUID: <white>" + player.getUniqueId()));
@@ -831,14 +842,14 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(mm.deserialize("<gray>Is Op: <white>" + player.isOp()));
 
         if (region == null) {
-            player.sendMessage(mm.deserialize("<yellow>No estás dentro de una protección."));
+            player.sendMessage(mm.deserialize(msg("commands.debug-no-protection")));
         } else {
             player.sendMessage(mm.deserialize(""));
-            player.sendMessage(mm.deserialize("<green><b>=== Información de la Protección ===</b></green>"));
-            player.sendMessage(mm.deserialize("<gray>Land ID: <white>" + region.getLandId()));
-            player.sendMessage(mm.deserialize(
-                    "<gray>Owner: <white>" + region.getOwnerName() + " (" + region.getOwnerUniqueId() + ")"));
-            player.sendMessage(mm.deserialize("<gray>Type: <white>" + region.getTypeId()));
+            player.sendMessage(mm.deserialize(msg("commands.debug-protection-title")));
+            player.sendMessage(mm.deserialize(msg("commands.debug-protection-id").replace("%id%", region.getLandId())));
+            player.sendMessage(mm.deserialize(msg("commands.debug-protection-owner")
+                    .replace("%owner%", region.getOwnerName() + " (" + region.getOwnerUniqueId() + ")")));
+            player.sendMessage(mm.deserialize(msg("commands.debug-protection-type").replace("%type%", region.getTypeId())));
             player.sendMessage(
                     mm.deserialize("<gray>Is Owner: <white>" + region.getOwnerUniqueId().equals(player.getUniqueId())));
             player.sendMessage(mm.deserialize("<gray>Is Member: <white>" + region.isMember(player.getUniqueId())));
@@ -847,7 +858,7 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                     + " - " + region.getMaxX() + "," + region.getMaxZ()));
 
             player.sendMessage(mm.deserialize(""));
-            player.sendMessage(mm.deserialize("<aqua><b>=== Flags ===</b></aqua>"));
+            player.sendMessage(mm.deserialize(msg("commands.debug-flags-title")));
 
             List<String> flagKeys = new ArrayList<>(region.getFlags().keySet());
             flagKeys.sort(String::compareToIgnoreCase);
@@ -856,15 +867,18 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                 boolean isBool = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(flag);
                 if (isBool) {
                     boolean enabled = region.isBooleanFlagEnabled(flag);
-                    String stateColor = enabled ? "<green>ON" : "<red>OFF";
-                    player.sendMessage(mm.deserialize("<gray>" + flag + ": <white>" + stateColor
-                            + " <gray>| Booleana"));
+                    String stateColor = enabled ? msg("commands.flag-boolean-state-on") : msg("commands.flag-boolean-state-off");
+                    player.sendMessage(mm.deserialize(msg("commands.debug-flag-boolean")
+                            .replace("%flag%", MessageUtils.getFlagName(flag))
+                            .replace("%state%", stateColor)));
                 } else {
                     com.amplan.amplprotections.model.FlagPermissionLevel level = region.getFlagLevel(flag);
                     boolean canAct = region.canPlayerAct(flag, player.getUniqueId());
-                    String canActColor = canAct ? "<green>SÍ" : "<red>NO";
-                    player.sendMessage(mm.deserialize("<gray>" + flag + ": <white>" + level.getDisplayName()
-                            + " <gray>| Puedes actuar: " + canActColor));
+                    String canActStr = canAct ? msg("commands.yes") : msg("commands.no");
+                    player.sendMessage(mm.deserialize(msg("commands.debug-flag-granular")
+                            .replace("%flag%", MessageUtils.getFlagName(flag))
+                            .replace("%level%", level.getDisplayName())
+                            .replace("%can%", canActStr)));
                 }
             }
 
@@ -873,11 +887,11 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                 boolean testIsBool = com.amplan.amplprotections.model.FlagPermissionLevel.isEnvironmental(testFlag);
 
                 player.sendMessage(mm.deserialize(""));
-                player.sendMessage(mm.deserialize("<yellow><b>=== Test de Flag: " + testFlag + " ===</b></yellow>"));
+                player.sendMessage(mm.deserialize(msg("commands.debug-flag-test-title").replace("%flag%", testFlag)));
 
                 if (testIsBool) {
                     boolean testEnabled = region.isBooleanFlagEnabled(testFlag);
-                    player.sendMessage(mm.deserialize("<gray>Tipo: <white>Booleana"));
+                    player.sendMessage(mm.deserialize(msg("commands.debug-flag-test-type").replace("%type%", msg("commands.boolean-type"))));
                     player.sendMessage(mm.deserialize("<gray>isBooleanFlagEnabled: <white>" + testEnabled));
 
                     if (args.length > 2) {
@@ -887,25 +901,30 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                             case "true", "on", "1" -> newVal = true;
                             case "false", "off", "0" -> newVal = false;
                             default -> {
-                                player.sendMessage(mm.deserialize("<red>Valor inválido. Usa: true/false, on/off, 1/0"));
+                                player.sendMessage(mm.deserialize(msg("commands.flag-invalid-value")));
                                 return;
                             }
                         }
                         region.setBooleanFlag(testFlag, newVal);
                         manager.getProtectionDao().saveBooleanFlagAsync(region.getDatabaseId(), testFlag, newVal);
-                        player.sendMessage(mm.deserialize(
-                                "<green>Flag " + testFlag + " cambiada a: <white>" + (newVal ? "ON" : "OFF")));
+                        String stateStr = newVal ? msg("commands.flag-boolean-state-on") : msg("commands.flag-boolean-state-off");
+                        player.sendMessage(mm.deserialize(msg("commands.debug-flag-changed")
+                                .replace("%flag%", MessageUtils.getFlagName(testFlag))
+                                .replace("%value%", stateStr)));
                     }
                 } else {
                     com.amplan.amplprotections.model.FlagPermissionLevel testLevel = region.getFlagLevel(testFlag);
                     boolean testCanAct = region.canPlayerAct(testFlag, player.getUniqueId());
                     boolean testCanPerform = region.canPerformAction(testFlag, region.getRank(player.getUniqueId()));
 
-                    player.sendMessage(mm.deserialize("<gray>Tipo: <white>Granular"));
-                    player.sendMessage(mm.deserialize("<gray>Flag Level: <white>" + testLevel.getDisplayName() + " (value: "
-                            + testLevel.getValue() + ")"));
-                    player.sendMessage(mm.deserialize("<gray>canPlayerAct: <white>" + testCanAct));
-                    player.sendMessage(mm.deserialize("<gray>canPerformAction (con rank): <white>" + testCanPerform));
+                    player.sendMessage(mm.deserialize(msg("commands.debug-flag-test-type").replace("%type%", msg("commands.granular-type"))));
+                    player.sendMessage(mm.deserialize(msg("commands.debug-flag-test-level")
+                            .replace("%level%", testLevel.getDisplayName())
+                            .replace("%value%", String.valueOf(testLevel.getValue()))));
+                    player.sendMessage(mm.deserialize(msg("commands.debug-flag-test-can-act")
+                            .replace("%can%", String.valueOf(testCanAct))));
+                    player.sendMessage(mm.deserialize(msg("commands.debug-flag-test-can-perform")
+                            .replace("%can%", String.valueOf(testCanPerform))));
                     player.sendMessage(mm.deserialize("<gray>isFlagEnabled: <white>" + region.isFlagEnabled(testFlag)));
 
                     if (args.length > 2) {
@@ -916,26 +935,28 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
                             region.setFlagLevel(testFlag, newLevel);
                             manager.getProtectionDao().saveFlagAsync(region.getDatabaseId(), testFlag, newLevel);
                             boolean afterCanAct = region.canPlayerAct(testFlag, player.getUniqueId());
-                            player.sendMessage(mm.deserialize(
-                                    "<green>Flag " + testFlag + " cambiada a: <white>" + newLevel.getDisplayName()));
+                            player.sendMessage(mm.deserialize(msg("commands.debug-flag-changed")
+                                    .replace("%flag%", MessageUtils.getFlagName(testFlag))
+                                    .replace("%value%", newLevel.getDisplayName())));
                             player.sendMessage(
-                                    mm.deserialize("<gray>canPlayerAct después del cambio: <white>" + afterCanAct));
+                                    mm.deserialize(msg("commands.debug-can-act-after").replace("%can%", String.valueOf(afterCanAct))));
                         } catch (IllegalArgumentException e) {
                             player.sendMessage(
-                                    mm.deserialize("<red>Nivel inválido. Usa: NONE, OWNER, MEMBERS, ADMINS, EVERYONE"));
+                                    mm.deserialize(msg("commands.flag-invalid-level")));
                         }
                     }
                 }
             }
 
             player.sendMessage(mm.deserialize(""));
-            player.sendMessage(mm.deserialize("<gray>Members (" + region.getMembers().size() + "):"));
+            player.sendMessage(mm.deserialize(msg("commands.debug-members-header").replace("%count%", String.valueOf(region.getMembers().size()))));
             for (Map.Entry<UUID, PlayerRank> entry : region.getMembers().entrySet()) {
                 String name = Bukkit.getOfflinePlayer(entry.getKey()).getName();
                 if (name == null)
                     name = entry.getKey().toString().substring(0, 8);
-                player.sendMessage(mm.deserialize(
-                        "  <gray>- <white>" + name + " <gray>[" + entry.getValue().getDisplayName() + "]"));
+                player.sendMessage(mm.deserialize(msg("commands.debug-member-entry")
+                        .replace("%name%", name)
+                        .replace("%rank%", entry.getValue().getDisplayName())));
             }
         }
     }
@@ -959,8 +980,7 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(mm.deserialize(msg("commands.help-rollback")));
         player.sendMessage(mm.deserialize(msg("commands.help-info")));
         player.sendMessage(mm.deserialize(msg("commands.help-lore")));
-        player.sendMessage(
-                mm.deserialize("<gray>/p debug <gray>- Muestra información de debug de la protección actual"));
+        player.sendMessage(mm.deserialize(msg("commands.debug-help-line")));
     }
 
     @Override

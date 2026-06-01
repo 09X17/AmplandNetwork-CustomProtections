@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.model.ProtectionRegion;
+import com.amplan.amplprotections.utils.MessageUtils;
 import com.amplan.amplprotections.utils.SkullUtils;
 
 import net.kyori.adventure.text.Component;
@@ -138,7 +139,7 @@ public class AdminMenu implements MenuManager.CustomMenu {
 
         FileConfiguration config = plugin.getAdminMenuConfig();
 
-        this.menuTitle = getConfigString(config, "title", "<red><b>⚙ PANEL ADMINISTRADOR</b></red>");
+        this.menuTitle = getConfigString(config, "title", MessageUtils.lang("admin-menu.title"));
 
         ConfigurationSection borderCfg = config.getConfigurationSection("border");
         this.borderMaterial = getMaterial(borderCfg, "material", Material.BLACK_STAINED_GLASS_PANE);
@@ -171,7 +172,7 @@ public class AdminMenu implements MenuManager.CustomMenu {
         ConfigurationSection searchCfg = config.getConfigurationSection("search");
         this.searchSlot = searchCfg != null ? searchCfg.getInt("slot", 2) : 2;
         this.searchMaterial = getMaterial(searchCfg, "material", Material.OAK_SIGN);
-        this.searchDisplayName = getConfigString(searchCfg, "display-name", "<aqua><b> Buscar Jugador</b></aqua>");
+        this.searchDisplayName = getConfigString(searchCfg, "display-name", MessageUtils.lang("admin-menu.search-btn"));
         this.searchLore = getConfigList(searchCfg, "lore", Arrays.asList(
                 "",
                 " <reset><yellow>▸ <gray>Haz clic para buscar</gray>",
@@ -204,7 +205,7 @@ public class AdminMenu implements MenuManager.CustomMenu {
 
         ConfigurationSection emptyCfg = config.getConfigurationSection("empty");
         this.emptyMaterial = getMaterial(emptyCfg, "material", Material.BARRIER);
-        this.emptyDisplayName = getConfigString(emptyCfg, "display-name", "<red><b>Sin Protecciones</b></red>");
+        this.emptyDisplayName = getConfigString(emptyCfg, "display-name", MessageUtils.lang("admin-menu.no-protections"));
         this.emptyLore = getConfigList(emptyCfg, "lore", Arrays.asList(
                 "",
                 " <reset><gray>No hay terrenos registrados.",

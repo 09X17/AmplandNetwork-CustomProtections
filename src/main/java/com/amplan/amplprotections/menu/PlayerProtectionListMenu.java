@@ -99,7 +99,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
 
         org.bukkit.configuration.file.FileConfiguration menuConfig = plugin.getMenuConfigManager().getListMenu();
 
-        this.menuTitle = menuConfig != null ? menuConfig.getString("title", "<dark_gray>Mis Protecciones") : "<dark_gray>Mis Protecciones";
+        this.menuTitle = menuConfig != null ? menuConfig.getString("title", MessageUtils.lang("list-menu.title")) : MessageUtils.lang("list-menu.title");
         this.inventory = Bukkit.createInventory(this, 54, mm.deserialize(menuTitle));
 
         ConfigurationSection borderCfg = menuConfig != null ? menuConfig.getConfigurationSection("border") : null;
@@ -109,31 +109,31 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
 
         ConfigurationSection statsCfg = menuConfig != null ? menuConfig.getConfigurationSection("stats-item") : null;
         this.statsMaterial = getMaterial(statsCfg, "material", Material.BEACON);
-        this.statsDisplayName = getConfigString(statsCfg, "display-name", "<gold><b>Estadisticas</b></gold>");
+        this.statsDisplayName = getConfigString(statsCfg, "display-name", MessageUtils.lang("list-menu.stats-btn"));
         this.statsLore = getConfigList(statsCfg, "lore", Arrays.asList(
-                "<gray>Tus protecciones: <white>%player%",
+                MessageUtils.lang("list-menu.stats-lore-count"),
                 "",
-                "<green>Clic para teletransportarte",
-                "<yellow>Shift + Clic para administrar"
+                MessageUtils.lang("list-menu.stats-lore-tp"),
+                MessageUtils.lang("list-menu.stats-lore-admin")
         ));
         this.statsCustomModelData = getCustomModelData(statsCfg, "custom-model-data", -1);
 
         ConfigurationSection emptyCfg = menuConfig != null ? menuConfig.getConfigurationSection("empty-item") : null;
         this.emptyMaterial = getMaterial(emptyCfg, "material", Material.BARRIER);
-        this.emptyDisplayName = getConfigString(emptyCfg, "display-name", "<red><b>Sin Protecciones</b></red>");
+        this.emptyDisplayName = getConfigString(emptyCfg, "display-name", MessageUtils.lang("list-menu.empty-btn"));
         this.emptyLore = getConfigList(emptyCfg, "lore", Arrays.asList(
-                "<gray>No tienes protecciones registradas.",
+                MessageUtils.lang("list-menu.empty-lore-1"),
                 "",
-                "<yellow>Coloca un bloque de proteccion",
-                "<yellow>para crear una zona"
+                MessageUtils.lang("list-menu.empty-lore-2"),
+                MessageUtils.lang("list-menu.empty-lore-3")
         ));
         this.emptyCustomModelData = getCustomModelData(emptyCfg, "custom-model-data", -1);
 
         ConfigurationSection closeCfg = menuConfig != null ? menuConfig.getConfigurationSection("close-button") : null;
         this.closeSlot = closeCfg != null ? closeCfg.getInt("slot", 49) : 49;
         this.closeMaterial = getMaterial(closeCfg, "material", Material.BARRIER);
-        this.closeDisplayName = getConfigString(closeCfg, "display-name", "<red><b>Cerrar</b></red>");
-        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList("<gray>Clic para salir"));
+        this.closeDisplayName = getConfigString(closeCfg, "display-name", MessageUtils.lang("menu.close-btn"));
+        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList(MessageUtils.lang("menu.close-lore")));
         this.closeCustomModelData = getCustomModelData(closeCfg, "custom-model-data", -1);
 
         ConfigurationSection refreshCfg = menuConfig != null ? menuConfig.getConfigurationSection("refresh-button") : null;
@@ -517,7 +517,7 @@ public class PlayerProtectionListMenu implements MenuManager.CustomMenu {
             int targetY = findSafeY(world, targetX, selectedRegion.getBlockY(), targetZ);
 
             if (targetY == -1) {
-                player.sendMessage(mm.deserialize("<red>✘ No se encontro una posicion segura para teletransportarse."));
+                player.sendMessage(mm.deserialize(MessageUtils.lang("list-menu.tp-unsafe")));
                 Location loc = player.getLocation();
                 if (loc == null) return;
                 player.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);

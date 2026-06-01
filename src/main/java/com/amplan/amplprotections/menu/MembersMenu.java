@@ -110,7 +110,7 @@ public class MembersMenu implements MenuManager.CustomMenu {
 
         org.bukkit.configuration.file.FileConfiguration menuConfig = plugin.getMenuConfigManager().getMembersMenu();
 
-        this.menuTitle = getConfigString(menuConfig, "title", "<dark_gray>Gestionar Miembros");
+        this.menuTitle = getConfigString(menuConfig, "title", MessageUtils.lang("members.menu-title"));
         this.inventory = Bukkit.createInventory(this, 54, mm.deserialize(menuTitle));
 
         ConfigurationSection borderCfg = menuConfig != null ? menuConfig.getConfigurationSection("border") : null;
@@ -127,14 +127,14 @@ public class MembersMenu implements MenuManager.CustomMenu {
 
         ConfigurationSection headerCfg = menuConfig != null ? menuConfig.getConfigurationSection("header") : null;
         this.headerMaterial = getMaterial(headerCfg, "material", Material.KNOWLEDGE_BOOK);
-        this.headerDisplayName = getConfigString(headerCfg, "display-name", "<gold><b>Informacion</b></gold>");
+        this.headerDisplayName = getConfigString(headerCfg, "display-name", MessageUtils.lang("members.menu-info-btn"));
         this.headerLore = getConfigList(headerCfg, "lore", Arrays.asList(
-                "<gray>Proteccion: <white>%name%",
-                "<gray>Dueno: <gold>%owner%",
-                "<gray>Miembros actuales: <white>%count%",
+                MessageUtils.lang("members.menu-info-lore-protection"),
+                MessageUtils.lang("members.menu-info-lore-owner"),
+                MessageUtils.lang("members.menu-info-lore-members"),
                 "",
-                "<green>Clic izquierdo: Expulsar",
-                "<yellow>Clic derecho: Ascender/Degradar"));
+                MessageUtils.lang("members.menu-info-lore-left"),
+                MessageUtils.lang("members.menu-info-lore-right")));
         this.headerCustomModelData = getCustomModelData(headerCfg, "custom-model-data", -1);
         this.headerSkullValue = getConfigString(headerCfg, "skull-value", null);
 
@@ -151,21 +151,21 @@ public class MembersMenu implements MenuManager.CustomMenu {
 
         ConfigurationSection emptyCfg = menuConfig != null ? menuConfig.getConfigurationSection("empty-item") : null;
         this.emptyMaterial = getMaterial(emptyCfg, "material", Material.PLAYER_HEAD);
-        this.emptyDisplayName = getConfigString(emptyCfg, "display-name", "<gray><b>Sin Miembros</b></gray>");
+        this.emptyDisplayName = getConfigString(emptyCfg, "display-name", MessageUtils.lang("members.menu-empty-btn"));
         this.emptyLore = getConfigList(emptyCfg, "lore", Arrays.asList(
-                "<gray>No hay miembros registrados.",
+                MessageUtils.lang("members.menu-empty-lore-1"),
                 "",
-                "<yellow>Usa /p add <jugador>",
-                "<yellow>para agregar miembros"));
+                MessageUtils.lang("members.menu-empty-lore-2"),
+                MessageUtils.lang("members.menu-empty-lore-3")));
         this.emptyCustomModelData = getCustomModelData(emptyCfg, "custom-model-data", -1);
         this.emptySkullValue = getConfigString(emptyCfg, "skull-value", null);
 
         ConfigurationSection backCfg = menuConfig != null ? menuConfig.getConfigurationSection("back-button") : null;
         this.backSlot = backCfg != null ? backCfg.getInt("slot", 49) : 49;
         this.backMaterial = getMaterial(backCfg, "material", Material.ARROW);
-        this.backDisplayName = getConfigString(backCfg, "display-name", "<aqua><b>Volver</b></aqua>");
+        this.backDisplayName = getConfigString(backCfg, "display-name", MessageUtils.lang("members.menu-back-btn"));
         this.backLore = getConfigList(backCfg, "lore",
-                Collections.singletonList("<gray>Clic para volver al menu principal"));
+                Collections.singletonList(MessageUtils.lang("members.menu-back-lore")));
         this.backCustomModelData = getCustomModelData(backCfg, "custom-model-data", -1);
         this.backSkullValue = getConfigString(backCfg, "skull-value", null);
 
@@ -173,9 +173,9 @@ public class MembersMenu implements MenuManager.CustomMenu {
                 : null;
         this.refreshSlot = refreshCfg != null ? refreshCfg.getInt("slot", 47) : 47;
         this.refreshMaterial = getMaterial(refreshCfg, "material", Material.COMPASS);
-        this.refreshDisplayName = getConfigString(refreshCfg, "display-name", "<white><b>Actualizar</b></white>");
+        this.refreshDisplayName = getConfigString(refreshCfg, "display-name", MessageUtils.lang("members.menu-refresh-btn"));
         this.refreshLore = getConfigList(refreshCfg, "lore",
-                Collections.singletonList("<gray>Clic para refrescar la lista"));
+                Collections.singletonList(MessageUtils.lang("members.menu-refresh-lore")));
         this.refreshCustomModelData = getCustomModelData(refreshCfg, "custom-model-data", -1);
         this.refreshSkullValue = getConfigString(refreshCfg, "skull-value", null);
 
@@ -183,22 +183,22 @@ public class MembersMenu implements MenuManager.CustomMenu {
                 : null;
         this.kickAllSlot = kickAllCfg != null ? kickAllCfg.getInt("slot", 51) : 51;
         this.kickAllMaterial = getMaterial(kickAllCfg, "material", Material.TNT);
-        this.kickAllDisplayName = getConfigString(kickAllCfg, "display-name", "<red><b>Expulsar Todos</b></red>");
+        this.kickAllDisplayName = getConfigString(kickAllCfg, "display-name", MessageUtils.lang("members.menu-kick-all-btn"));
         this.kickAllLore = getConfigList(kickAllCfg, "lore", Arrays.asList(
-                "<red>Expulsara a todos los miembros!",
+                MessageUtils.lang("members.menu-kick-all-lore-1"),
                 "",
-                "<dark_gray>Shift + Clic para ejecutar"));
+                MessageUtils.lang("members.menu-kick-all-lore-2")));
         this.kickAllCustomModelData = getCustomModelData(kickAllCfg, "custom-model-data", -1);
         this.kickAllSkullValue = getConfigString(kickAllCfg, "skull-value", null);
 
         ConfigurationSection ranksCfg = menuConfig != null ? menuConfig.getConfigurationSection("ranks") : null;
-        this.rankOwnerDisplay = getConfigString(ranksCfg, "owner.display", "Dueno");
+        this.rankOwnerDisplay = getConfigString(ranksCfg, "owner.display", MessageUtils.lang("info.member-owner"));
         this.rankOwnerColor = getConfigString(ranksCfg, "owner.color", "<gold>");
-        this.rankSecondaryOwnerDisplay = getConfigString(ranksCfg, "secondary-owner.display", "Dueno Secundario");
+        this.rankSecondaryOwnerDisplay = getConfigString(ranksCfg, "secondary-owner.display", MessageUtils.lang("info.member-secondary-owner"));
         this.rankSecondaryOwnerColor = getConfigString(ranksCfg, "secondary-owner.color", "<light_purple>");
-        this.rankAdminDisplay = getConfigString(ranksCfg, "admin.display", "Administrador");
+        this.rankAdminDisplay = getConfigString(ranksCfg, "admin.display", MessageUtils.lang("info.member-admin"));
         this.rankAdminColor = getConfigString(ranksCfg, "admin.color", "<red>");
-        this.rankMemberDisplay = getConfigString(ranksCfg, "member.display", "Miembro");
+        this.rankMemberDisplay = getConfigString(ranksCfg, "member.display", MessageUtils.lang("info.member-member"));
         this.rankMemberColor = getConfigString(ranksCfg, "member.color", "<green>");
 
         ConfigurationSection actionsCfg = menuConfig != null ? menuConfig.getConfigurationSection("actions") : null;
@@ -281,7 +281,7 @@ public class MembersMenu implements MenuManager.CustomMenu {
         for (int i = 0; i < allMembers.size() && i < memberSlots.length; i++) {
             UUID memberUuid = allMembers.get(i);
             OfflinePlayer target = Bukkit.getOfflinePlayer(memberUuid);
-            String targetName = target.getName() != null ? target.getName() : "Desconocido";
+            String targetName = target.getName() != null ? target.getName() : MessageUtils.lang("members.rank-unknown");
             PlayerRank rank = region.getRank(memberUuid);
 
             String rankDisplay = getRankDisplay(rank);
@@ -292,7 +292,7 @@ public class MembersMenu implements MenuManager.CustomMenu {
 
             switch (rank) {
                 case OWNER -> {
-                    actionLore = "<gray>No se puede cambiar el rango del dueno";
+                    actionLore = MessageUtils.lang("members.rank-cannot-change-owner");
                     kickAction = "";
                 }
                 case SECONDARY_OWNER -> {
@@ -527,20 +527,20 @@ public class MembersMenu implements MenuManager.CustomMenu {
                     player.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.5f);
                     return;
                 }
-                String safeName = Objects.requireNonNullElse(targetName, "Desconocido");
-                String ownerName = Objects.requireNonNullElse(player.getName(), "Desconocido");
+                String safeName = Objects.requireNonNullElse(targetName, MessageUtils.lang("members.rank-unknown"));
+                String ownerName = Objects.requireNonNullElse(player.getName(), MessageUtils.lang("members.rank-unknown"));
 
                 switch (currentRank) {
                     case MEMBER -> {
                         region.addMember(targetUuid, PlayerRank.ADMIN);
                         plugin.getProtectionManager().getProtectionDao().saveMemberAsync(region.getDatabaseId(),
                                 targetUuid, "ADMIN");
-                        player.sendMessage(parse("members.promoted", "<green>Promovido.")
+                        player.sendMessage(parse("members.promoted", MessageUtils.lang("members.rank-promoted"))
                                 .replaceText(b -> b.matchLiteral("%member%").replacement(safeName)));
                         if (target.isOnline()) {
                             Player targetPlayer = target.getPlayer();
                             if (targetPlayer != null)
-                                targetPlayer.sendMessage(parse("members.notify-promoted", "<green>Promovido.")
+                                targetPlayer.sendMessage(parse("members.notify-promoted", MessageUtils.lang("members.rank-promoted"))
                                         .replaceText(b -> b.matchLiteral("%owner%").replacement(ownerName)));
                         }
                     }
@@ -548,12 +548,12 @@ public class MembersMenu implements MenuManager.CustomMenu {
                         region.addMember(targetUuid, PlayerRank.SECONDARY_OWNER);
                         plugin.getProtectionManager().getProtectionDao().saveMemberAsync(region.getDatabaseId(),
                                 targetUuid, "SECONDARY_OWNER");
-                        player.sendMessage(parse("members.promoted-secondary", "<green>Promovido.")
+                        player.sendMessage(parse("members.promoted-secondary", MessageUtils.lang("members.rank-promoted"))
                                 .replaceText(b -> b.matchLiteral("%member%").replacement(safeName)));
                         if (target.isOnline()) {
                             Player targetPlayer = target.getPlayer();
                             if (targetPlayer != null)
-                                targetPlayer.sendMessage(parse("members.notify-promoted-secondary", "<green>Promovido.")
+                                targetPlayer.sendMessage(parse("members.notify-promoted-secondary", MessageUtils.lang("members.rank-promoted"))
                                         .replaceText(b -> b.matchLiteral("%owner%").replacement(ownerName)));
                         }
                     }
@@ -561,12 +561,12 @@ public class MembersMenu implements MenuManager.CustomMenu {
                         region.addMember(targetUuid, PlayerRank.ADMIN);
                         plugin.getProtectionManager().getProtectionDao().saveMemberAsync(region.getDatabaseId(),
                                 targetUuid, "ADMIN");
-                        player.sendMessage(parse("members.demoted-to-admin", "<red>Degradado.")
+                        player.sendMessage(parse("members.demoted-to-admin", MessageUtils.lang("members.rank-demoted"))
                                 .replaceText(b -> b.matchLiteral("%member%").replacement(safeName)));
                         if (target.isOnline()) {
                             Player targetPlayer = target.getPlayer();
                             if (targetPlayer != null)
-                                targetPlayer.sendMessage(parse("members.notify-demoted", "<red>Degradado.")
+                                targetPlayer.sendMessage(parse("members.notify-demoted", MessageUtils.lang("members.rank-demoted"))
                                         .replaceText(b -> b.matchLiteral("%owner%").replacement(ownerName)));
                         }
                     }
@@ -587,8 +587,8 @@ public class MembersMenu implements MenuManager.CustomMenu {
                 if (target.isOnline()) {
                     Player targetPlayer = target.getPlayer();
                     if (targetPlayer != null) {
-                        String ownerName = Objects.requireNonNullElse(player.getName(), "Desconocido");
-                        targetPlayer.sendMessage(parse("members.notify-removed", "<red>Removido.")
+                        String ownerName = Objects.requireNonNullElse(player.getName(), MessageUtils.lang("members.rank-unknown"));
+                        targetPlayer.sendMessage(parse("members.notify-removed", MessageUtils.lang("members.rank-removed"))
                                 .replaceText(b -> b.matchLiteral("%owner%").replacement(ownerName)));
                     }
                 }
@@ -633,7 +633,7 @@ public class MembersMenu implements MenuManager.CustomMenu {
 
     private String formatJoinDate(Long timestamp) {
         if (timestamp == null || timestamp <= 0)
-            return "<gray>Desconocido";
+            return MessageUtils.lang("members.join-date-unknown");
         java.time.Instant instant = java.time.Instant.ofEpochMilli(timestamp);
         java.time.LocalDateTime dt = java.time.LocalDateTime.ofInstant(instant, java.time.ZoneId.systemDefault());
         java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

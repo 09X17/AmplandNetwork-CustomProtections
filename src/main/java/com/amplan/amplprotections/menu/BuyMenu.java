@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.model.ProtectionType;
 import com.amplan.amplprotections.utils.ItemBuilder;
+import com.amplan.amplprotections.utils.MessageUtils;
 import com.amplan.amplprotections.utils.SkullUtils;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -67,8 +68,8 @@ public class BuyMenu implements MenuManager.CustomMenu {
         ConfigurationSection menuConfig = config;
 
         this.menuTitle = menuConfig != null
-                ? menuConfig.getString("title", "<gold><b>TIENDA DE PROTECCIONES</b></gold>")
-                : "<gold><b>TIENDA DE PROTECCIONES</b></gold>";
+                ? menuConfig.getString("title", MessageUtils.lang("buy.title"))
+                : MessageUtils.lang("buy.title");
         this.inventory = Bukkit.createInventory(this, 54, mm.deserialize(menuTitle));
 
         ConfigurationSection borderCfg = menuConfig != null ? menuConfig.getConfigurationSection("border") : null;
@@ -82,25 +83,25 @@ public class BuyMenu implements MenuManager.CustomMenu {
         this.itemSkullValue = getConfigString(itemCfg, "skull-value", null);
         this.itemDisplayName = getConfigString(itemCfg, "display-name", "<gold><b>%name%</b></gold>");
         this.itemLore = getConfigList(itemCfg, "lore", Arrays.asList(
-                "<gray>Tamano: <yellow>%size%x%size%",
-                "<gray>Radio: <aqua>%radius% bloques",
+                MessageUtils.lang("buy-menu.item-lore-size"),
+                MessageUtils.lang("buy-menu.item-lore-radius"),
                 "",
-                "<green>Precio: <yellow>$%price%",
+                MessageUtils.lang("buy-menu.item-lore-price"),
                 "",
-                "<gray>Clic para comprar"));
+                MessageUtils.lang("buy-menu.item-lore-click")));
 
         ConfigurationSection backCfg = menuConfig != null ? menuConfig.getConfigurationSection("back-button") : null;
         this.backSlot = backCfg != null ? backCfg.getInt("slot", 49) : 49;
         this.backMaterial = getMaterial(backCfg, "material", Material.ARROW);
-        this.backDisplayName = getConfigString(backCfg, "display-name", "<aqua><b>Volver</b></aqua>");
-        this.backLore = getConfigList(backCfg, "lore", Collections.singletonList("<gray>Clic para volver"));
+        this.backDisplayName = getConfigString(backCfg, "display-name", MessageUtils.lang("buy-menu.back-btn"));
+        this.backLore = getConfigList(backCfg, "lore", Collections.singletonList(MessageUtils.lang("buy-menu.back-lore")));
         this.backCustomModelData = getCustomModelData(backCfg, "custom-model-data", -1);
 
         ConfigurationSection closeCfg = menuConfig != null ? menuConfig.getConfigurationSection("close-button") : null;
         this.closeSlot = closeCfg != null ? closeCfg.getInt("slot", 53) : 53;
         this.closeMaterial = getMaterial(closeCfg, "material", Material.BARRIER);
-        this.closeDisplayName = getConfigString(closeCfg, "display-name", "<red><b>Cerrar</b></red>");
-        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList("<gray>Clic para salir"));
+        this.closeDisplayName = getConfigString(closeCfg, "display-name", MessageUtils.lang("menu.close-btn"));
+        this.closeLore = getConfigList(closeCfg, "lore", Collections.singletonList(MessageUtils.lang("menu.close-lore")));
         this.closeCustomModelData = getCustomModelData(closeCfg, "custom-model-data", -1);
 
         buildInventoryContents();
@@ -159,7 +160,7 @@ public class BuyMenu implements MenuManager.CustomMenu {
                         .replace("%radius%", String.valueOf(radius))
                         .replace("%price%",
                                 plugin.getEconomyManager().isEnabled() ? plugin.getEconomyManager().format(price)
-                                        : "Gratis")
+                                        : MessageUtils.lang("buy-menu.item-lore-free"))
                         .replace("%type%", typeId));
             }
 

@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.model.ProtectionRegion;
 import com.amplan.amplprotections.utils.ItemBuilder;
+import com.amplan.amplprotections.utils.MessageUtils;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -65,8 +66,8 @@ public class RollbackMenu implements MenuManager.CustomMenu {
         ConfigurationSection menuConfig = config;
 
         this.menuTitle = menuConfig != null
-                ? menuConfig.getString("title", "<gold><b>ROLLBACK DE PROTECCION</b></gold>")
-                : "<gold><b>ROLLBACK DE PROTECCION</b></gold>";
+                ? menuConfig.getString("title", MessageUtils.lang("rollback-menu.title"))
+                : MessageUtils.lang("rollback-menu.title");
         this.inventory = Bukkit.createInventory(this, 54, mm.deserialize(menuTitle));
 
         ConfigurationSection borderCfg = menuConfig != null ? menuConfig.getConfigurationSection("border") : null;
@@ -137,8 +138,8 @@ public class RollbackMenu implements MenuManager.CustomMenu {
                             ItemMeta meta = head.getItemMeta();
                             if (meta != null) {
                                 List<String> lore = new ArrayList<>();
-                                lore.add("<gray>Jugador: <yellow>" + playerName);
-                                lore.add("<green>Clic para revertir cambios de este jugador");
+                                lore.add(MessageUtils.lang("rollback-menu.player-lore").replace("%player%", playerName));
+                                lore.add(MessageUtils.lang("rollback-menu.player-hint"));
                                 meta.lore(lore.stream().map(mm::deserialize).collect(Collectors.toList()));
                                 head.setItemMeta(meta);
                             }
@@ -167,8 +168,8 @@ public class RollbackMenu implements MenuManager.CustomMenu {
         inventory.setItem(closeSlot, closeBtn);
 
         ItemStack allBtn = new ItemBuilder(Material.TNT)
-                .setDisplayName("<red><b>Revertir TODOS los cambios</b></red>")
-                .setLore("<gray>Shift + Clic para revertir todos los jugadores")
+                .setDisplayName(MessageUtils.lang("rollback-menu.all-btn"))
+                .setLore(MessageUtils.lang("rollback-menu.all-lore"))
                 .build();
         inventory.setItem(47, allBtn);
     }

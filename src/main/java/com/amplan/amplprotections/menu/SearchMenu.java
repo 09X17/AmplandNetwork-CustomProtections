@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.utils.SkullUtils;
-
+import com.amplan.amplprotections.utils.MessageUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 @SuppressWarnings("ThisEscapedInObjectConstruction")
@@ -111,7 +111,7 @@ public class SearchMenu implements MenuManager.CustomMenu, Listener {
 
         FileConfiguration config = plugin.getAdminMenuConfig();
 
-        this.menuTitle = getConfigString(config, "title", "<red><b>⚙ PANEL ADMINISTRADOR</b></red>");
+        this.menuTitle = getConfigString(config, "title", MessageUtils.lang("search-menu.title"));
 
         ConfigurationSection borderCfg = config.getConfigurationSection("border");
         this.borderMaterial = getMaterial(borderCfg, "material", Material.BLACK_STAINED_GLASS_PANE);
@@ -130,14 +130,14 @@ public class SearchMenu implements MenuManager.CustomMenu, Listener {
         this.searchHeaderSlot = headerCfg != null ? headerCfg.getInt("slot", 4) : 4;
         this.searchHeaderMaterial = getMaterial(headerCfg, "material", Material.KNOWLEDGE_BOOK);
         this.searchHeaderDisplayName = getConfigString(headerCfg, "display-name",
-                "<aqua><b>Resultados de Búsqueda</b></aqua>");
+                MessageUtils.lang("search-menu.header-btn"));
         this.searchHeaderLore = getConfigList(headerCfg, "lore", Arrays.asList(
                 "",
-                " <reset><yellow>▸ <gray>Buscando: <white>%search%",
-                " <reset><yellow>▸ <gray>Encontradas: <white>%found%",
-                " <reset><yellow>▸ <gray>Total del servidor: <white>%total%",
+                MessageUtils.lang("search-menu.header-lore-searching"),
+                MessageUtils.lang("search-menu.header-lore-found"),
+                MessageUtils.lang("search-menu.header-lore-total"),
                 "",
-                " <reset><yellow>Clic en una región para editar"));
+                MessageUtils.lang("search-menu.header-lore-click")));
         this.searchHeaderCustomModelData = getCustomModelData(headerCfg, "custom-model-data", -1);
         this.searchHeaderSkullValue = getConfigString(headerCfg, "skull-value", null);
 
@@ -154,13 +154,13 @@ public class SearchMenu implements MenuManager.CustomMenu, Listener {
         ConfigurationSection emptyCfg = config.getConfigurationSection("search-empty");
         this.searchEmptyMaterial = getMaterial(emptyCfg, "material", Material.PLAYER_HEAD);
         this.searchEmptyDisplayName = getConfigString(emptyCfg, "display-name",
-                "<red><b>Jugador No Encontrado</b></red>");
+                MessageUtils.lang("search-menu.empty-btn"));
         this.searchEmptyLore = getConfigList(emptyCfg, "lore", Arrays.asList(
                 "",
-                " <reset><gray>No se encontraron protecciones",
-                " <reset><gray>para el jugador: <white>%search%",
+                MessageUtils.lang("search-menu.empty-lore-1"),
+                MessageUtils.lang("search-menu.empty-lore-2") + " <white>%search%",
                 "",
-                " <reset><yellow>Intenta con otro nombre"));
+                MessageUtils.lang("search-menu.empty-lore-3")));
         this.searchEmptyCustomModelData = getCustomModelData(emptyCfg, "custom-model-data", -1);
         this.searchEmptySkullValue = getConfigString(emptyCfg, "skull-value", null);
 
@@ -479,7 +479,7 @@ public class SearchMenu implements MenuManager.CustomMenu, Listener {
                 plugin.getMenuManager().openMenu(player,
                         new PlayerProtectionListMenu(plugin, selectedPlayer.getPlayer(), 1));
             } else {
-                player.sendMessage(mm.deserialize("<red>Este jugador no está online."));
+                player.sendMessage(mm.deserialize(MessageUtils.lang("search-menu.player-not-online")));
                 Location loc = player.getLocation();
                 if (loc == null)
                     return;
