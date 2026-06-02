@@ -137,6 +137,13 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
     private final String presetDisplayName;
     private final List<String> presetLore;
     private final String presetSkullValue;
+    private final boolean transferEnabled;
+    private final int transferSlot;
+    private final Material transferMaterial;
+    private final int transferCustomModelData;
+    private final String transferDisplayName;
+    private final List<String> transferLore;
+    private final String transferSkullValue;
 
     public MainProtectionMenu(AmplProtections plugin, ProtectionRegion region) {
         this(plugin, region, 1);
@@ -305,6 +312,16 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
         this.presetLore = getConfigList(presetCfg, "lore",
                 Collections.singletonList(MessageUtils.lang("menu.preset-lore")));
         this.presetSkullValue = getConfigString(presetCfg, "skull-value", null);
+
+        ConfigurationSection transferCfg = menuConfig.getConfigurationSection("transfer-button");
+        this.transferEnabled = transferCfg != null ? transferCfg.getBoolean("enabled", true) : true;
+        this.transferSlot = transferCfg != null ? transferCfg.getInt("slot", 53) : 53;
+        this.transferMaterial = getMaterial(transferCfg, "material", Material.PLAYER_HEAD);
+        this.transferCustomModelData = getCustomModelData(transferCfg, "custom-model-data", -1);
+        this.transferDisplayName = getConfigString(transferCfg, "display-name", MessageUtils.lang("menu.transfer-btn"));
+        this.transferLore = getConfigList(transferCfg, "lore",
+                Collections.singletonList(MessageUtils.lang("menu.transfer-lore")));
+        this.transferSkullValue = getConfigString(transferCfg, "skull-value", null);
 
         buildInventoryContents();
     }
@@ -604,6 +621,12 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
                     presetCustomModelData, presetSkullValue);
             inventory.setItem(presetSlot, presetBtn);
         }
+
+        if (transferEnabled) {
+            ItemStack transferBtn = buildConfigurableItem(transferMaterial, transferDisplayName, transferLore,
+                    transferCustomModelData, transferSkullValue);
+            inventory.setItem(transferSlot, transferBtn);
+        }
     }
 
     private void buildPaginationBar() {
@@ -778,6 +801,16 @@ public class MainProtectionMenu implements MenuManager.CustomMenu {
                 return;
             player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
             plugin.getMenuManager().openMenu(player, new PresetMenu(plugin, region, player));
+            return;
+        }
+
+        if (slot == transferSlot && transferEnabled) {
+            Location loc = player.getLocation();
+            if (loc == null)
+                return;
+            player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
+            player.closeInventory();
+            player.sendMessage(mm.deserialize(MessageUtils.lang("transfer.usage")));
             return;
         }
 

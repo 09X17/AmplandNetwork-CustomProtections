@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.manager.ProtectionManager;
+import com.amplan.amplprotections.menu.BulkManageMenu;
 import com.amplan.amplprotections.menu.BuyMenu;
 import com.amplan.amplprotections.menu.MainProtectionMenu;
 import com.amplan.amplprotections.menu.MergeMenu;
@@ -88,6 +89,8 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
             case "hologram", "holo" -> handleHologram(player, region);
             case "rent", "alquiler" -> handleRent(player, region, args);
             case "rollback", "rb" -> handleRollback(player, region, args);
+            case "transfer", "transferir" -> handleTransfer(player, region, args);
+            case "bulk", "masivo" -> handleBulkManage(player);
             case "debug" -> handleDebug(player, region, args);
             default -> sendHelpMessage(player);
         }
@@ -813,6 +816,69 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
         }
     }
 
+    private void handleTransfer(Player player, ProtectionRegion region, String[] args) {
+        if (region == null) {
+            player.sendMessage(mm.deserialize(msg("general.not-in-protection")));
+            return;
+        }
+        if (!region.getOwnerUniqueId().equals(player.getUniqueId())
+                && !player.hasPermission("amplprotections.admin.bypass")) {
+            player.sendMessage(mm.deserialize(msg("transfer.no-permission")));
+            return;
+        }
+        if (args.length < 2) {
+            player.sendMessage(mm.deserialize(msg("transfer.usage")));
+            return;
+        }
+
+        Player target = Bukkit.getPlayer(args[1]);
+        if (target == null) {
+            player.sendMessage(mm.deserialize(msg("general.player-not-found")));
+            return;
+        }
+
+        if (region.getOwnerUniqueId().equals(target.getUniqueId())) {
+            player.sendMessage(mm.deserialize(msg("transfer.already-owner")));
+            return;
+        }
+
+        UUID oldOwner = region.getOwnerUniqueId();
+        String oldOwnerName = region.getOwnerName();
+
+        region.getMembers().remove(target.getUniqueId());
+        manager.getProtectionDao().deleteMemberAsync(region.getDatabaseId(), target.getUniqueId());
+
+        manager.getProtectionDao().transferOwnershipAsync(region.getDatabaseId(), target.getUniqueId()).thenRun(() -> {
+            plugin.getProtectionManager().clearOwnerNameCache();
+        });
+
+        player.sendMessage(mm.deserialize(msg("transfer.success")
+                .replace("%player%", target.getName())
+                .replace("%region%", region.getCustomName())));
+        target.sendMessage(mm.deserialize(msg("transfer.notify-received")
+                .replace("%owner%", player.getName())
+                .replace("%region%", region.getCustomName())));
+
+        if (plugin.getHologramManager() != null) {
+            plugin.getHologramManager().removeHologram(region);
+            if (region.isHologramEnabled()) {
+                plugin.getHologramManager().spawnHologram(region);
+            }
+        }
+    }
+
+    private void handleBulkManage(Player player) {
+        List<ProtectionRegion> regions = manager.getRegionsByOwner(player.getUniqueId());
+        if (regions.isEmpty()) {
+            player.sendMessage(mm.deserialize(msg("bulk-menu.no-protections")));
+            return;
+        }
+        Location loc = player.getLocation();
+        if (loc == null) return;
+        player.playSound(loc, Sound.UI_BUTTON_CLICK, 1f, 1f);
+        plugin.getMenuManager().openMenu(player, new BulkManageMenu(plugin, player));
+    }
+
     private boolean canManageMembers(Player player, ProtectionRegion region) {
         if (region.getOwnerUniqueId().equals(player.getUniqueId()))
             return true;
@@ -978,6 +1044,8 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(mm.deserialize(msg("commands.help-hologram")));
         player.sendMessage(mm.deserialize(msg("commands.help-rent")));
         player.sendMessage(mm.deserialize(msg("commands.help-rollback")));
+        player.sendMessage(mm.deserialize(msg("commands.help-transfer")));
+        player.sendMessage(mm.deserialize(msg("commands.help-bulk")));
         player.sendMessage(mm.deserialize(msg("commands.help-info")));
         player.sendMessage(mm.deserialize(msg("commands.help-lore")));
         player.sendMessage(mm.deserialize(msg("commands.debug-help-line")));
@@ -989,7 +1057,7 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             String input = args[0].toLowerCase();
             List<String> subs = List.of("menu", "info", "lore", "add", "remove", "promote", "demote", "members", "flag",
-                    "view", "list", "buy", "merge", "preset", "hologram", "rent", "rollback", "debug");
+                    "view", "list", "buy", "merge", "preset", "hologram", "rent", "rollback", "transfer", "bulk", "debug");
             return subs.stream().filter(s -> s.startsWith(input)).collect(Collectors.toList());
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("flag")) {

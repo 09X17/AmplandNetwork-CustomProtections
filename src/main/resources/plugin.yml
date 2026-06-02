@@ -1,5 +1,5 @@
 name: AmplProtections
-version: '1.0.11'
+version: '1.0.12'
 main: com.amplan.amplprotections.AmplProtections
 api-version: '1.21'
 description: Advanced protection system with custom blocks, flags, rentals and more.

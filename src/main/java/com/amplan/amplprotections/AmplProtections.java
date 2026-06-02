@@ -182,6 +182,7 @@ public final class AmplProtections extends JavaPlugin {
         ConfigUpdater.updateConfig(this, "menus/preset-menu.yml");
         ConfigUpdater.updateConfig(this, "menus/rental-menu.yml");
         ConfigUpdater.updateConfig(this, "menus/rollback-menu.yml");
+        ConfigUpdater.updateConfig(this, "menus/bulk-manage-menu.yml");
         reloadConfig();
         blocksConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "blocks.yml"));
         adminMenuConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "admin-menu.yml"));

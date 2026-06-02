@@ -179,6 +179,16 @@ preset-button:
   lore:
   - <gray>Click to apply a flag preset
 
+transfer-button:
+  enabled: true
+  slot: 53
+  material: PLAYER_HEAD
+  custom-model-data: -1
+  skull-value: ''
+  display-name: <yellow><b>Transfer Ownership</b></yellow>
+  lore:
+  - <gray>Click and type /p transfer <player>
+
 # You can define custom items for each flag state using material, custom model data, or skull value
 # Granular flags (5 levels): none, owner, members, admins, everyone
 # Boolean flags (enabled/disabled): enabled, disabled

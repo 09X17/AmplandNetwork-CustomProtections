@@ -1,0 +1,80 @@
+# Bulk Manage Menu Configuration
+# This menu allows owners to select multiple protections and add a member to all of them at once.
+
+title: "<dark_gray>Gestion Masiva de Protecciones"
+
+border:
+  material: BLACK_STAINED_GLASS_PANE
+  display-name: "<dark_gray> "
+  custom-model-data: -1
+
+stats-item:
+  material: BEACON
+  display-name: "<gold><b>Seleccion</b></gold>"
+  lore:
+    - "<gray>Total protecciones: <white>%total%"
+    - "<gray>Seleccionadas: <green>%selected%"
+    - ""
+    - "<gray>Selecciona protecciones y confirma"
+  custom-model-data: -1
+
+region-item:
+  display-name: "%status% <gold><b>%name%</b></gold>"
+  lore:
+    - "<gray>ID: <yellow>%land_id%"
+    - "<gray>Mundo: <green>%world%"
+    - "<gray>Centro: <aqua>%x%, %y%, %z%"
+    - "<gray>Tamano: <yellow>%size%"
+    - "<gray>Miembros: <white>%members%"
+    - ""
+    - "<green>Clic para alternar seleccion"
+  custom-model-data: -1
+
+confirm-button:
+  slot: 50
+  material: EMERALD
+  display-name: "<green><b>Confirmar (%count%)</b></green>"
+  lore:
+    - "<gray>Añadir miembro a seleccionadas"
+    - "<gray>Clic para continuar"
+  custom-model-data: -1
+
+select-all-button:
+  slot: 51
+  material: GOLDEN_APPLE
+  display-name: "<yellow><b>Seleccionar Todo</b></yellow>"
+  lore:
+    - "<gray>Clic para alternar seleccion"
+  custom-model-data: -1
+
+close-button:
+  slot: 49
+  material: BARRIER
+  display-name: "<red><b>Cerrar</b></red>"
+  lore:
+    - "Clic para salir"
+  custom-model-data: -1
+
+prev-button:
+  slot: 45
+  material: ARROW
+  display-name: "<green><b>Anterior</b></green>"
+  lore:
+    - "<gray>Clic para pagina %page%"
+  custom-model-data: -1
+
+next-button:
+  slot: 53
+  material: ARROW
+  display-name: "<green><b>Siguiente</b></green>"
+  lore:
+    - "<gray>Clic para pagina %page%"
+  custom-model-data: -1
+
+page-info:
+  slot: 47
+  material: KNOWLEDGE_BOOK
+  display-name: "<gray>Pagina %current% / %total%</b></gray>"
+  lore:
+    - "<gray>Seleccionadas: <green>%selected% <gray>| Mostrando: %showing% / %totalRegions%"
+  custom-model-data: -1

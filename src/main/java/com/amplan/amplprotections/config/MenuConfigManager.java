@@ -23,7 +23,8 @@ public class MenuConfigManager {
         "menus/merge-menu.yml",
         "menus/preset-menu.yml",
         "menus/rental-menu.yml",
-        "menus/rollback-menu.yml"
+        "menus/rollback-menu.yml",
+        "menus/bulk-manage-menu.yml"
     };
 
     public MenuConfigManager(AmplProtections plugin) {

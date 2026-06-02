@@ -82,8 +82,6 @@ public class ConfigUpdater {
                 changed = true;
             }
 
-            changed |= syncTopLevelSections(userLines, defaultLines);
-
             if (changed) {
                 Files.write(file.toPath(), userLines, StandardCharsets.UTF_8);
                 LOGGER.info("Config actualizada: " + fileName);
@@ -94,73 +92,6 @@ public class ConfigUpdater {
             LOGGER.warning("Error actualizando " + fileName + ": " + e.getMessage());
             return false;
         }
-    }
-
-    private static boolean syncTopLevelSections(List<String> userLines, List<String> defaultLines) {
-        boolean changed = false;
-
-        for (String topKey : defaultKeyOrder(defaultLines)) {
-            int userIdx = findTopLevelKeyIndex(userLines, topKey);
-            if (userIdx == -1) continue;
-
-            int defaultIdx = findTopLevelKeyIndex(defaultLines, topKey);
-            if (defaultIdx == -1) continue;
-
-            List<String> userBlock = collectBlock(userLines, userIdx);
-            List<String> defaultBlock = collectBlock(defaultLines, defaultIdx);
-
-            List<String> newBlock = new ArrayList<>();
-            int userLineIdx = 0;
-
-            for (int d = 0; d < defaultBlock.size(); d++) {
-                String defaultLine = defaultBlock.get(d);
-                String defaultTrimmed = defaultLine.trim();
-
-                if (defaultTrimmed.isEmpty() || defaultTrimmed.startsWith("#")) {
-                    if (userLineIdx < userBlock.size()) {
-                        String userTrimmed = userBlock.get(userLineIdx).trim();
-                        if (userTrimmed.equals(defaultTrimmed) ||
-                                userTrimmed.startsWith("#") || userTrimmed.isEmpty()) {
-                            newBlock.add(userBlock.get(userLineIdx));
-                            userLineIdx++;
-                        } else {
-                            newBlock.add(defaultLine);
-                        }
-                    } else {
-                        newBlock.add(defaultLine);
-                    }
-                    continue;
-                }
-
-                String defaultKey = getKeyFromLine(defaultTrimmed);
-                if (defaultKey == null) {
-                    if (userLineIdx < userBlock.size()) {
-                        newBlock.add(userBlock.get(userLineIdx));
-                        userLineIdx++;
-                    } else {
-                        newBlock.add(defaultLine);
-                    }
-                    continue;
-                }
-
-                int blockIdx = findLineIndexWithKey(userBlock, userLineIdx, defaultKey);
-                if (blockIdx != -1) {
-                    newBlock.add(userBlock.get(blockIdx));
-                    userLineIdx = blockIdx + 1;
-                } else {
-                    newBlock.add(defaultLine);
-                    changed = true;
-                }
-            }
-
-            int userEnd = findTopLevelKeyEnd(userLines, topKey);
-            if (userEnd != -1) {
-                userLines.subList(userIdx, userEnd + 1).clear();
-                userLines.addAll(userIdx, newBlock);
-            }
-        }
-
-        return changed;
     }
 
     private static List<String> defaultKeyOrder(List<String> defaultLines) {
@@ -511,7 +442,22 @@ public class ConfigUpdater {
         if (!file.exists()) {
             plugin.saveResource(fileName, false);
         } else {
+            if (!isValidYaml(file)) {
+                LOGGER.warning(fileName + " está corrupto, regenerando...");
+                file.delete();
+                plugin.saveResource(fileName, false);
+                return;
+            }
             updateConfig(plugin, fileName);
+        }
+    }
+
+    private static boolean isValidYaml(File file) {
+        try {
+            YamlConfiguration.loadConfiguration(file);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

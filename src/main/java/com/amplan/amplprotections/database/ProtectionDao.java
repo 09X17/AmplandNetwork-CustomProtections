@@ -686,4 +686,18 @@ public class ProtectionDao {
         }
         return false;
     }
+
+    public CompletableFuture<Void> transferOwnershipAsync(int regionId, UUID newOwnerUuid) {
+        return CompletableFuture.runAsync(() -> {
+            String sql = "UPDATE ap_protections SET owner_uuid = ? WHERE id = ?";
+            try (Connection conn = getDb().getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, newOwnerUuid.toString());
+                ps.setInt(2, regionId);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, "Error transfiriendo propiedad", e);
+            }
+        }, getDb().getDbExecutor());
+    }
 }
