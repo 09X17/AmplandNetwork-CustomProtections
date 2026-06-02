@@ -1,4 +1,5 @@
 # AmplProtections
+<img width="1920" height="650" alt="_Neon Cyberpunk Desktop Wallpaper" src="https://github.com/user-attachments/assets/24cdfafb-c882-4c00-bcc2-f9fe4caa7484" />
 
 Advanced region protection system for Minecraft Paper 1.21 servers.
 
