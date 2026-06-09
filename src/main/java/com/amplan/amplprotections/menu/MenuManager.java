@@ -17,10 +17,9 @@ import com.amplan.amplprotections.AmplProtections;
 
 public class MenuManager implements Listener {
 
-    @SuppressWarnings("unused")
     private final AmplProtections plugin;
     private final Map<UUID, CustomMenu> activeMenus = new HashMap<>();
-
+    
     public MenuManager(AmplProtections plugin) {
         this.plugin = plugin;
     }

@@ -77,9 +77,7 @@ public class MigrationManager {
             return 0;
         }
 
-        String placeholders = String.join(", ", columns.stream().map(c -> "?").toList());
-        String columnList = String.join(", ", columns);
-        String[] columnsArray = columns.toArray(new String[0]);
+        String[] columnsArray = columns.toArray(String[]::new);
         String insertSql = targetDb.getDialect().getUpsertSql(table, columnsArray, new String[]{columnsArray[0]});
 
         int count = 0;

@@ -42,7 +42,7 @@ public class ProtectionManager {
     private final ProtectionDao protectionDao;
     private final NamespacedKey protectionKey;
 
-    private final Map<String, List<ProtectionRegion>> worldRegions = new HashMap<>();
+    private final Map<String, List<ProtectionRegion>> worldRegions = new ConcurrentHashMap<>();
     private final Map<Integer, ProtectionRegion> idMap = new HashMap<>();
     private final Map<String, ProtectionType> protectionTypes = new HashMap<>();
     private final Map<UUID, String> ownerNameCache = new ConcurrentHashMap<>();
@@ -163,8 +163,8 @@ public class ProtectionManager {
             owner.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(MessageUtils.lang("protection-manager.collision-detected")));
             return;
         }
+        worldRegions.computeIfAbsent(region.getWorldName(), k -> new CopyOnWriteArrayList<>()).add(region);
         protectionDao.saveRegionAsync(region).thenRun(() -> {
-            worldRegions.computeIfAbsent(region.getWorldName(), k -> new CopyOnWriteArrayList<>()).add(region);
             idMap.put(region.getDatabaseId(), region);
         });
         owner.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(MessageUtils.lang("protection-manager.protection-established")));
@@ -235,10 +235,18 @@ public class ProtectionManager {
                     conn.commit();
                 }
             } catch (SQLException e) {
-                conn.rollback();
-                throw e;
+                plugin.getLogger().log(Level.WARNING, "Error during batch save, rolling back", e);
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    plugin.getLogger().log(Level.SEVERE, "Failed to rollback transaction", rollbackEx);
+                }
             } finally {
-                conn.setAutoCommit(true);
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException e) {
+                    plugin.getLogger().log(Level.WARNING, "Failed to restore auto-commit", e);
+                }
             }
         } catch (SQLException e) {
             plugin.getLogger().log(Level.WARNING, "Error guardando regiones al desactivar", e);
@@ -257,8 +265,8 @@ public class ProtectionManager {
     }
 
     public void createRegion(ProtectionRegion region) {
+        worldRegions.computeIfAbsent(region.getWorldName(), k -> new CopyOnWriteArrayList<>()).add(region);
         protectionDao.saveRegionAsync(region).thenRun(() -> {
-            worldRegions.computeIfAbsent(region.getWorldName(), k -> new CopyOnWriteArrayList<>()).add(region);
             idMap.put(region.getDatabaseId(), region);
         });
     }
@@ -828,5 +836,10 @@ public class ProtectionManager {
         }
 
         protectionDao.deleteMergeHistorySync(mergedRegion.getDatabaseId());
+    }
+
+    public void updateOwnerInMemory(ProtectionRegion region, UUID newOwnerUuid) {
+        region.setOwnerUniqueId(newOwnerUuid);
+        clearOwnerNameCache();
     }
 }

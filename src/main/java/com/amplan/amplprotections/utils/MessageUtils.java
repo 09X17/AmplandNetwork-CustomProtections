@@ -16,7 +16,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 public class MessageUtils {
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
-    private static final String PREFIX = "<dark_gray>[<gradient:gold:yellow>🛡️ Protecciones</gradient>]<gray> ";
+    private static final String PREFIX = "<dark_gray>[<gradient:gold:yellow>Protecciones</gradient>]<gray> ";
 
     public static Component parse(String text) {
         if (text == null)

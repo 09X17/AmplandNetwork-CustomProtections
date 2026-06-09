@@ -262,3 +262,10 @@ rollback:
   enabled: true
   flush-interval-ticks: 600
   max-age-days: 7
+
+# ============================================
+#  VERSION CHECKER
+# ============================================
+# Checks for updates on Modrinth
+version-checker:
+  enabled: true

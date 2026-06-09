@@ -16,6 +16,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.amplan.amplprotections.AmplProtections;
 import com.amplan.amplprotections.manager.ProtectionManager;
@@ -169,5 +170,10 @@ public class EntityListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        lastAccessDenied.remove(event.getPlayer().getUniqueId());
     }
 }

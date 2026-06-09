@@ -28,6 +28,7 @@ import com.amplan.amplprotections.rental.RentalManager;
 import com.amplan.amplprotections.rollback.BlockLogger;
 import com.amplan.amplprotections.rollback.RollbackManager;
 import com.amplan.amplprotections.utils.ConfigUpdater;
+import com.amplan.amplprotections.utils.VersionChecker;
 
 public final class AmplProtections extends JavaPlugin {
 
@@ -53,6 +54,7 @@ public final class AmplProtections extends JavaPlugin {
     private ChatSearchListener chatSearchListener;
     private LanguageManager languageManager;
     private ProtectionListener protectionListener;
+    private VersionChecker versionChecker;
 
     @Override
     public void onEnable() {
@@ -111,6 +113,12 @@ public final class AmplProtections extends JavaPlugin {
         getServer().getPluginManager().registerEvents(this.protectionListener, this);
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
+
+        this.versionChecker = new VersionChecker(this);
+        getServer().getPluginManager().registerEvents(this.versionChecker, this);
+        if (getConfig().getBoolean("version-checker.enabled", true)) {
+            versionChecker.checkForUpdates();
+        }
 
         AdminProtectionCommand adminCmd = new AdminProtectionCommand(this);
 

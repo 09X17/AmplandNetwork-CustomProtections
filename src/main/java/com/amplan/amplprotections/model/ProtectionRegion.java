@@ -16,7 +16,7 @@ public class ProtectionRegion {
 
     private int databaseId;
     private String landId;
-    private final UUID ownerUniqueId;
+    private UUID ownerUniqueId;
     private final String worldName;
     private String customName;
     private String customLore;
@@ -134,7 +134,7 @@ public class ProtectionRegion {
     public boolean isPvpEnabled() { return getFlagLevel("pvp") != FlagPermissionLevel.NONE; }
     public boolean isTntEnabled() { return isBooleanFlagEnabled("tnt"); }
     public boolean isMobSpawnEnabled() { return isBooleanFlagEnabled("mob-spawn"); }
-    public int getRadius() { return (maxX - minX) / 2; }
+    public int getRadius() { return (maxX - minX + 1) / 2; }
 
     public String getOwnerName() {
         OfflinePlayer owner = Bukkit.getOfflinePlayer(ownerUniqueId);
@@ -227,6 +227,7 @@ public class ProtectionRegion {
     public String getLandId() { return landId; }
     public void setLandId(String landId) { this.landId = landId; }
     public UUID getOwnerUniqueId() { return ownerUniqueId; }
+    public void setOwnerUniqueId(UUID uuid) { this.ownerUniqueId = uuid; }
     public String getWorldName() { return worldName; }
     public String getCustomName() { return customName; }
     public void setCustomName(String name) { this.customName = name; }

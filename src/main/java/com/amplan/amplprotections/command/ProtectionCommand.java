@@ -212,7 +212,6 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
 
         region.setCustomLore(lore);
         manager.saveRegionAsync(region);
-        manager.getProtectionDao().updateLoreAsync(region.getDatabaseId(), lore);
         player.sendMessage(mm.deserialize(msg("commands.lore-updated")));
     }
 
@@ -842,14 +841,11 @@ public class ProtectionCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        UUID oldOwner = region.getOwnerUniqueId();
-        String oldOwnerName = region.getOwnerName();
-
         region.getMembers().remove(target.getUniqueId());
         manager.getProtectionDao().deleteMemberAsync(region.getDatabaseId(), target.getUniqueId());
 
         manager.getProtectionDao().transferOwnershipAsync(region.getDatabaseId(), target.getUniqueId()).thenRun(() -> {
-            plugin.getProtectionManager().clearOwnerNameCache();
+            manager.updateOwnerInMemory(region, target.getUniqueId());
         });
 
         player.sendMessage(mm.deserialize(msg("transfer.success")

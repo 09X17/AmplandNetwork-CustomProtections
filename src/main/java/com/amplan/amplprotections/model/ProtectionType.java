@@ -45,5 +45,4 @@ public class ProtectionType {
     public boolean isGlowOnView() { return glowOnView; }
     public boolean isEnableMerge() { return enableMerge; }
     public int getMaxMergeRadius() { return maxMergeRadius; }
-    public boolean canMerge() { return enableMerge; }
 }

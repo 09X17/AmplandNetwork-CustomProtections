@@ -134,7 +134,7 @@ public class AdminProtectionCommand implements CommandExecutor, TabCompleter {
 
     private void handleDelete(CommandSender sender) {
         if (!(sender instanceof Player player)) {
-            Objects.requireNonNull(sender).sendMessage(parse("general.only-players", "<red>Only players."));
+            sender.sendMessage(parse("general.only-players", "<red>Only players."));
             return;
         }
         ProtectionRegion region = manager.getRegionAt(player.getLocation());
@@ -153,9 +153,9 @@ public class AdminProtectionCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendAdminHelp(CommandSender sender) {
-        sender.sendMessage(mm.deserialize(String.valueOf(msg("admin.help-title"))));
-        sender.sendMessage(mm.deserialize(String.valueOf(msg("admin.help-give"))));
-        sender.sendMessage(mm.deserialize(String.valueOf(msg("admin.help-other"))));
+        sender.sendMessage(mm.deserialize(msg("admin.help-title")));
+        sender.sendMessage(mm.deserialize(msg("admin.help-give")));
+        sender.sendMessage(mm.deserialize(msg("admin.help-other")));
     }
 
     @Override

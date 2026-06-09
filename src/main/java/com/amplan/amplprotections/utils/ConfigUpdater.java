@@ -2,6 +2,7 @@ package com.amplan.amplprotections.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,18 +24,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ConfigUpdater {
 
     private static final String LIST_MARKER = "- ";
-    private static final Logger LOGGER = Logger.getLogger("AmplProtections");
 
     public static boolean updateConfig(JavaPlugin plugin, String fileName) {
         File file = new File(plugin.getDataFolder(), fileName);
-        if (!file.exists()) return false;
+        if (!file.exists())
+            return false;
 
         try {
             FileConfiguration userConfig = YamlConfiguration.loadConfiguration(file);
 
             List<String> defaultLines;
             try (InputStream stream = plugin.getResource(fileName)) {
-                if (stream == null) return false;
+                if (stream == null)
+                    return false;
                 defaultLines = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
                         .lines().collect(Collectors.toList());
             }
@@ -49,12 +51,13 @@ public class ConfigUpdater {
 
             Set<String> newKeys = findNewKeys(defaultConfig, userConfig, "");
             if (!newKeys.isEmpty()) {
-                LOGGER.info(fileName + " - Keys nuevas: " + newKeys);
+                plugin.getLogger().info(String.format("%s - Keys nuevas: %s", fileName, newKeys));
             }
 
             for (String key : newKeys) {
                 int defaultLineIdx = findKeyLineInDefault(defaultLines, key);
-                if (defaultLineIdx == -1) continue;
+                if (defaultLineIdx == -1)
+                    continue;
 
                 List<String> keyBlock = collectKeyBlock(defaultLines, defaultLineIdx);
                 boolean isListItem = isListItem(defaultLines, defaultLineIdx);
@@ -84,12 +87,12 @@ public class ConfigUpdater {
 
             if (changed) {
                 Files.write(file.toPath(), userLines, StandardCharsets.UTF_8);
-                LOGGER.info("Config actualizada: " + fileName);
+                plugin.getLogger().log(Level.INFO, () -> "Config actualizada: " + fileName);
             }
             return changed;
 
-        } catch (Exception e) {
-            LOGGER.warning("Error actualizando " + fileName + ": " + e.getMessage());
+        } catch (IOException | SecurityException e) {
+            plugin.getLogger().log(Level.WARNING, e, () -> "Error actualizando " + fileName + ": " + e.getMessage());
             return false;
         }
     }
@@ -98,45 +101,15 @@ public class ConfigUpdater {
         List<String> order = new ArrayList<>();
         for (String line : defaultLines) {
             String trimmed = line.trim();
-            if (trimmed.isEmpty() || trimmed.startsWith("#")) continue;
+            if (trimmed.isEmpty() || trimmed.startsWith("#"))
+                continue;
             if (countIndent(line) == 0 && trimmed.contains(":")) {
                 String key = trimmed.split(":")[0].trim();
-                if (!key.isEmpty()) order.add(key);
+                if (!key.isEmpty())
+                    order.add(key);
             }
         }
         return order;
-    }
-
-    private static List<String> collectBlock(List<String> lines, int startIdx) {
-        List<String> block = new ArrayList<>();
-        block.add(lines.get(startIdx));
-        int keyIndent = countIndent(lines.get(startIdx));
-        for (int i = startIdx + 1; i < lines.size(); i++) {
-            String trimmed = lines.get(i).trim();
-            if (trimmed.isEmpty()) {
-                block.add(lines.get(i));
-                continue;
-            }
-            if (countIndent(lines.get(i)) > keyIndent) {
-                block.add(lines.get(i));
-            } else {
-                break;
-            }
-        }
-        return block;
-    }
-
-    private static String getKeyFromLine(String trimmed) {
-        if (!trimmed.contains(":") || trimmed.startsWith("- ")) return null;
-        return trimmed.split(":")[0].trim();
-    }
-
-    private static int findLineIndexWithKey(List<String> block, int fromIdx, String key) {
-        for (int i = fromIdx; i < block.size(); i++) {
-            String trimmed = block.get(i).trim();
-            if (trimmed.startsWith(key + ":")) return i;
-        }
-        return -1;
     }
 
     private static Set<String> findNewKeys(ConfigurationSection defaults, ConfigurationSection target, String path) {
@@ -167,14 +140,17 @@ public class ConfigUpdater {
 
         for (int i = 0; i < defaultLines.size(); i++) {
             String trimmed = defaultLines.get(i).trim();
-            if (trimmed.startsWith("#") || trimmed.isEmpty()) continue;
+            if (trimmed.startsWith("#") || trimmed.isEmpty())
+                continue;
             int indent = countIndent(defaultLines.get(i));
-            if (indent != targetIndent) continue;
+            if (indent != targetIndent)
+                continue;
             String lineKey = trimmed.split(":")[0].trim();
             if (lineKey.equals(targetKeyName)) {
                 if (parts.length > 1) {
                     String parentKey = parts[parts.length - 2];
-                    if (!hasParentKey(defaultLines, i, parentKey)) continue;
+                    if (!hasParentKey(defaultLines, i, parentKey))
+                        continue;
                 }
                 return i;
             }
@@ -186,7 +162,8 @@ public class ConfigUpdater {
         int lineIndent = countIndent(lines.get(lineIndex));
         for (int i = lineIndex - 1; i >= 0; i--) {
             String trimmed = lines.get(i).trim();
-            if (trimmed.startsWith("#") || trimmed.isEmpty()) continue;
+            if (trimmed.startsWith("#") || trimmed.isEmpty())
+                continue;
             int indent = countIndent(lines.get(i));
             if (indent < lineIndent) {
                 String key = trimmed.split(":")[0].trim();
@@ -199,7 +176,8 @@ public class ConfigUpdater {
     private static boolean isListItem(List<String> lines, int keyIndex) {
         for (int i = keyIndex - 1; i >= 0; i--) {
             String trimmed = lines.get(i).trim();
-            if (trimmed.startsWith("#") || trimmed.isEmpty()) continue;
+            if (trimmed.startsWith("#") || trimmed.isEmpty())
+                continue;
             return trimmed.startsWith(LIST_MARKER);
         }
         return false;
@@ -214,7 +192,8 @@ public class ConfigUpdater {
             if (trimmed.startsWith("#") || trimmed.isEmpty()) {
                 block.add(0, lines.get(i));
                 i--;
-            } else break;
+            } else
+                break;
         }
 
         block.add(lines.get(startIndex));
@@ -231,7 +210,8 @@ public class ConfigUpdater {
             if (countIndent(line) > keyIndent) {
                 block.add(line);
                 i++;
-            } else break;
+            } else
+                break;
         }
 
         return block;
@@ -246,7 +226,8 @@ public class ConfigUpdater {
             if (keyPos > 0) {
                 String prevSibling = defaultKeyOrder.get(keyPos - 1);
                 int prevEnd = findTopLevelKeyEnd(userLines, prevSibling);
-                if (prevEnd != -1) return prevEnd + 1;
+                if (prevEnd != -1)
+                    return prevEnd + 1;
             }
             return userLines.size();
         }
@@ -257,7 +238,8 @@ public class ConfigUpdater {
         if (prevSibling != null) {
             String prevFull = parentPath + "." + prevSibling;
             int prevEnd = findNestedKeyEnd(userLines, prevFull);
-            if (prevEnd != -1) return prevEnd + 1;
+            if (prevEnd != -1)
+                return prevEnd + 1;
         }
 
         int parentLine = findKeyLineInUser(userLines, parentPath);
@@ -266,7 +248,8 @@ public class ConfigUpdater {
             int lastChild = -1;
             for (int i = parentLine + 1; i < userLines.size(); i++) {
                 String trimmed = userLines.get(i).trim();
-                if (trimmed.isEmpty()) continue;
+                if (trimmed.isEmpty())
+                    continue;
                 if (trimmed.startsWith("#")) {
                     lastChild = i;
                     continue;
@@ -293,29 +276,22 @@ public class ConfigUpdater {
         String prevSibling = null;
         for (int i = 0; i < defaultLines.size(); i++) {
             String trimmed = defaultLines.get(i).trim();
-            if (trimmed.startsWith("#") || trimmed.isEmpty()) continue;
+            if (trimmed.startsWith("#") || trimmed.isEmpty())
+                continue;
             int indent = countIndent(defaultLines.get(i));
-            if (indent != targetIndent) continue;
+            if (indent != targetIndent)
+                continue;
 
             String lineKey = trimmed.split(":")[0].trim();
 
-            if (parentKey != null && !hasParentKey(defaultLines, i, parentKey)) continue;
+            if (parentKey != null && !hasParentKey(defaultLines, i, parentKey))
+                continue;
 
-            if (lineKey.equals(targetKeyName)) return prevSibling;
+            if (lineKey.equals(targetKeyName))
+                return prevSibling;
             prevSibling = lineKey;
         }
         return null;
-    }
-
-    private static int findTopLevelKeyIndex(List<String> lines, String key) {
-        for (int i = 0; i < lines.size(); i++) {
-            String trimmed = lines.get(i).trim();
-            if (trimmed.startsWith("#") || trimmed.isEmpty()) continue;
-            if (countIndent(lines.get(i)) != 0) continue;
-            String lineKey = trimmed.split(":")[0].trim();
-            if (lineKey.equals(key)) return i;
-        }
-        return -1;
     }
 
     private static int findTopLevelKeyEnd(List<String> lines, String key) {
@@ -326,11 +302,13 @@ public class ConfigUpdater {
         for (int i = 0; i < lines.size(); i++) {
             String trimmed = lines.get(i).trim();
             if (trimmed.isEmpty()) {
-                if (found) lastEnd = i;
+                if (found)
+                    lastEnd = i;
                 continue;
             }
             if (trimmed.startsWith("#")) {
-                if (found) lastEnd = i;
+                if (found)
+                    lastEnd = i;
                 continue;
             }
             int indent = countIndent(lines.get(i));
@@ -367,11 +345,13 @@ public class ConfigUpdater {
         for (int i = 0; i < lines.size(); i++) {
             String trimmed = lines.get(i).trim();
             if (trimmed.isEmpty()) {
-                if (found) lastEnd = i;
+                if (found)
+                    lastEnd = i;
                 continue;
             }
             if (trimmed.startsWith("#")) {
-                if (found) lastEnd = i;
+                if (found)
+                    lastEnd = i;
                 continue;
             }
             int indent = countIndent(lines.get(i));
@@ -405,9 +385,11 @@ public class ConfigUpdater {
 
         for (int i = 0; i < userLines.size(); i++) {
             String trimmed = userLines.get(i).trim();
-            if (trimmed.startsWith("#") || trimmed.isEmpty()) continue;
+            if (trimmed.startsWith("#") || trimmed.isEmpty())
+                continue;
             int indent = countIndent(userLines.get(i));
-            if (indent != targetIndent) continue;
+            if (indent != targetIndent)
+                continue;
             String lineKey = trimmed.split(":")[0].trim();
             if (lineKey.equals(targetKeyName)) {
                 if (parentKey == null || hasParentKey(userLines, i, parentKey)) {
@@ -421,8 +403,10 @@ public class ConfigUpdater {
     private static String getLineIndent(String line) {
         StringBuilder sb = new StringBuilder();
         for (char c : line.toCharArray()) {
-            if (c == ' ' || c == '\t') sb.append(c);
-            else break;
+            if (c == ' ' || c == '\t')
+                sb.append(c);
+            else
+                break;
         }
         return sb.toString();
     }
@@ -430,9 +414,13 @@ public class ConfigUpdater {
     private static int countIndent(String line) {
         int count = 0;
         for (char c : line.toCharArray()) {
-            if (c == ' ') count++;
-            else if (c == '\t') count += 2;
-            else break;
+            switch (c) {
+                case ' ' -> count++;
+                case '\t' -> count += 2;
+                default -> {
+                    return count;
+                }
+            }
         }
         return count;
     }
@@ -443,8 +431,12 @@ public class ConfigUpdater {
             plugin.saveResource(fileName, false);
         } else {
             if (!isValidYaml(file)) {
-                LOGGER.warning(fileName + " está corrupto, regenerando...");
-                file.delete();
+                plugin.getLogger().log(Level.WARNING, () -> fileName + " está corrupto, regenerando...");
+                if (!file.delete()) {
+                    plugin.getLogger().log(Level.WARNING,
+                            () -> "No se pudo eliminar " + fileName + ", puede estar en uso.");
+                    return;
+                }
                 plugin.saveResource(fileName, false);
                 return;
             }
